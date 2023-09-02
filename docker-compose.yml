@@ -3,5 +3,7 @@ services:
     build: .
     ports:
       - "3000:3000"
+      # For hmr and other vite stuff
+      - "24678:24678"
     volumes:
       - ./nuxt-app:/srv/app

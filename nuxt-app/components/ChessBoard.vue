@@ -56,6 +56,7 @@ class ChessBoard {
   turn: 'WHITE' | 'BLACK' = 'WHITE'
   whiteCastle = true
   blackCastle = true
+  enPassantSquare: Square | null = null
 
   constructor () {
     this.ranks = []
@@ -88,6 +89,7 @@ class ChessBoard {
     this.turn = 'WHITE'
     this.whiteCastle = true
     this.blackCastle = true
+    this.enPassantSquare = null
     this
       .setSquare(Piece.WhiteRook, RankName.r1, FileName.A)
       .setSquare(Piece.WhiteKnight, RankName.r1, FileName.B)

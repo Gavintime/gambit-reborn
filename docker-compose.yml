@@ -5,5 +5,6 @@ services:
       - "3000:3000"
       # For hmr and other vite stuff
       - "24678:24678"
+    # TODO: remove for prod
     volumes:
       - ./nuxt-app:/srv/app

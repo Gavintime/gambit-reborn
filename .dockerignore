@@ -1,2 +1,3 @@
 ./nuxt-app/.gitignore
 ./nuxt-app/node_modules
+./nuxt-app/.nuxt

@@ -79,7 +79,7 @@ class ChessBoard {
     }
   }
 
-  setSquare (piece: Piece | null, rank: RankName, file: FileName): this {
+  private setSquare (piece: Piece | null, rank: RankName, file: FileName): this {
     this.ranks[rank].squares[file].piece = piece
     return this
   }

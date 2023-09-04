@@ -44,30 +44,22 @@ type Square = {
   file: File
 }
 
-type BoardRank = {
-  squares: Square[]
-  rank: Rank
-}
-
 class ChessBoard {
-  ranks: BoardRank[]
+  squares: Square[][]
   turn: 'WHITE' | 'BLACK' = 'WHITE'
   whiteCastle = true
   blackCastle = true
   enPassantSquare: Square | null = null
 
   constructor () {
-    this.ranks = []
+    this.squares = []
 
-    // create ranks and squares
+    // create ranks
     for (let i = 0; i < 8; i++) {
-      this.ranks[i] = {
-        squares: [],
-        rank: i
-      }
-
+      this.squares[i] = []
+      // create squares
       for (let j = 0; j < 8; j++) {
-        this.ranks[i].squares[j] = {
+        this.squares[i][j] = {
           piece: null,
           rank: i,
           file: j
@@ -77,7 +69,7 @@ class ChessBoard {
   }
 
   private setSquare (piece: Piece | null, rank: Rank, file: File): this {
-    this.ranks[rank].squares[file].piece = piece
+    this.squares[rank][file].piece = piece
     return this
   }
 
@@ -86,6 +78,7 @@ class ChessBoard {
     this.whiteCastle = true
     this.blackCastle = true
     this.enPassantSquare = null
+    // TODO: this needs to reset all squares
     this
       .setSquare(Piece.WhiteRook, Rank.r1, File.A)
       .setSquare(Piece.WhiteKnight, Rank.r1, File.B)
@@ -122,8 +115,8 @@ chessBoard.setStartBoard()
 <template>
   <div>
     <div class="container-fluid">
-      <div v-for="{squares, rank} in chessBoard.ranks" :key="rank" class="row g-0 board-rank">
-        <div v-for="{piece, rank: squareRank , file} in squares" :key="file * 10 + squareRank" class="col board-square">
+      <div v-for="row in chessBoard.squares" :key="row[0].rank" class="row g-0 board-rank">
+        <div v-for="{piece, rank, file} in row" :key="file * 10 + rank" class="col board-square">
           <div v-if="piece != null" :class="piece" />
         </div>
       </div>

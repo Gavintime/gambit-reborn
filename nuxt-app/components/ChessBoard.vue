@@ -2,14 +2,14 @@
 
 // Ranks are indexed in reverse order so they render correctly in v-for loops
 enum Rank {
-  r1 = 7,
-  r2 = 6,
-  r3 = 5,
-  r4 = 4,
-  r5 = 3,
-  r6 = 2,
-  r7 = 1,
-  r8 = 0
+  R1 = 7,
+  R2 = 6,
+  R3 = 5,
+  R4 = 4,
+  R5 = 3,
+  R6 = 2,
+  R7 = 1,
+  R8 = 0
 }
 
 enum File {
@@ -38,20 +38,18 @@ enum Piece {
   WhiteRook = 'wR'
 }
 
-type Square = Piece | null
-
 type Coord = {
-  file: File | null
-  rank: Rank | null
+  file: File
+  rank: Rank
 }
 
 class ChessBoard {
   // 8x8
-  squares: Square[][]
+  squares: (Piece | null)[][]
   turn: 'WHITE' | 'BLACK' = 'WHITE'
   whiteCastle = true
   blackCastle = true
-  enPassantSquare: Square | null = null
+  enPassantSquare: Coord | null = null
 
   constructor () {
     this.squares = []
@@ -66,25 +64,11 @@ class ChessBoard {
     }
   }
 
-  private clearBoard (): this {
-    this.squares.forEach((row, rowIndex, squaresArray) => {
-      row.forEach((_, colIndex) => {
-        squaresArray[rowIndex][colIndex] = null
-      })
-    })
-    return this
-  }
-
-  private setSquare (piece: Piece | null, file: File, rank: Rank): this {
-    this.squares[rank][file] = piece
-    return this
-  }
-
-  // does not do move validation
-  movePiece (startFile: File, startRank: Rank, endFile: File, endRank: Rank): this {
-    const tempPiece = this.squares[startRank][startFile]
-    this.setSquare(null, startFile, startRank)
-    this.setSquare(tempPiece, endFile, endRank)
+  // does not do move validation or understand castling/enpassant
+  makeMove (start: Coord, end: Coord): this {
+    const tempPiece = this.squares[start.rank][start.file]
+    this.squares[start.rank][start.file] = null
+    this.squares[end.rank][end.file] = tempPiece
 
     this.turn = this.turn === 'WHITE' ? 'BLACK' : 'WHITE'
 
@@ -96,33 +80,38 @@ class ChessBoard {
     this.whiteCastle = true
     this.blackCastle = true
     this.enPassantSquare = null
-    this
-      .clearBoard()
-      .setSquare(Piece.WhiteRook, File.A, Rank.r1)
-      .setSquare(Piece.WhiteKnight, File.B, Rank.r1)
-      .setSquare(Piece.WhiteBishop, File.C, Rank.r1)
-      .setSquare(Piece.WhiteQueen, File.D, Rank.r1)
-      .setSquare(Piece.WhiteKing, File.E, Rank.r1)
-      .setSquare(Piece.WhiteBishop, File.F, Rank.r1)
-      .setSquare(Piece.WhiteKnight, File.G, Rank.r1)
-      .setSquare(Piece.WhiteRook, File.H, Rank.r1)
-      .setSquare(Piece.BlackRook, File.A, Rank.r8)
-      .setSquare(Piece.BlackKnight, File.B, Rank.r8)
-      .setSquare(Piece.BlackBishop, File.C, Rank.r8)
-      .setSquare(Piece.BlackQueen, File.D, Rank.r8)
-      .setSquare(Piece.BlackKing, File.E, Rank.r8)
-      .setSquare(Piece.BlackBishop, File.F, Rank.r8)
-      .setSquare(Piece.BlackKnight, File.G, Rank.r8)
-      .setSquare(Piece.BlackRook, File.H, Rank.r8)
+
+    this.squares[Rank.R1][File.A] = Piece.WhiteRook
+    this.squares[Rank.R1][File.B] = Piece.WhiteKnight
+    this.squares[Rank.R1][File.C] = Piece.WhiteBishop
+    this.squares[Rank.R1][File.D] = Piece.WhiteQueen
+    this.squares[Rank.R1][File.E] = Piece.WhiteKing
+    this.squares[Rank.R1][File.F] = Piece.WhiteBishop
+    this.squares[Rank.R1][File.G] = Piece.WhiteKnight
+    this.squares[Rank.R1][File.H] = Piece.WhiteRook
+
+    this.squares[Rank.R8][File.A] = Piece.BlackRook
+    this.squares[Rank.R8][File.B] = Piece.BlackKnight
+    this.squares[Rank.R8][File.C] = Piece.BlackBishop
+    this.squares[Rank.R8][File.D] = Piece.BlackQueen
+    this.squares[Rank.R8][File.E] = Piece.BlackKing
+    this.squares[Rank.R8][File.F] = Piece.BlackBishop
+    this.squares[Rank.R8][File.G] = Piece.BlackKnight
+    this.squares[Rank.R8][File.H] = Piece.BlackRook
 
     for (let file = 0; file < 8; file++) {
-      this
-        .setSquare(Piece.WhitePawn, file, Rank.r2)
-        .setSquare(Piece.BlackPawn, file, Rank.r7)
+      this.squares[Rank.R2][file] = Piece.WhitePawn
+      this.squares[Rank.R7][file] = Piece.BlackPawn
+      // clear ranks 3 to 6
+      for (let rank = 2; rank < 6; rank++) {
+        this.squares[rank][file] = null
+      }
     }
     return this
   }
 }
+
+const chessBoard = reactive(new ChessBoard())
 
 function getCoordFromID (id: string): Coord {
   return {
@@ -131,37 +120,31 @@ function getCoordFromID (id: string): Coord {
   }
 }
 
-const srcSquare: Coord = reactive({
-  file: null,
-  rank: null
-})
-
-const chessBoard = reactive(new ChessBoard())
-chessBoard.setStartBoard()
-
+let srcCoord: Coord | null = null
 function squareClick (event: Event) {
   // console.log((event.target as HTMLElement).parentElement?.id)
   const id = (event.target as HTMLElement).parentElement?.id
-  if (id === undefined) {
-    return
-  }
 
-  const coord = getCoordFromID(id)
-  if (coord.file === null || coord.rank === null) {
-    return
-  }
+  const coord = getCoordFromID(id!)
 
   // first click
-  if (srcSquare.file === null || srcSquare.rank === null) {
-    srcSquare.file = coord.file
-    srcSquare.rank = coord.rank
+  if (srcCoord === null) {
+    srcCoord = {
+      file: coord.file,
+      rank: coord.rank
+    }
     return
   }
 
-  chessBoard.movePiece(srcSquare.file, srcSquare.rank, coord.file, coord.rank)
-  srcSquare.file = null
-  srcSquare.rank = null
+  chessBoard.makeMove(srcCoord, coord)
+  srcCoord = null
 }
+
+// TODO: lifecycle hook to set board to start/fen BEFORE board is rendered at all
+onMounted(() => {
+  chessBoard.setStartBoard()
+})
+
 </script>
 
 <template>
@@ -169,8 +152,7 @@ function squareClick (event: Event) {
     <div class="container-fluid">
       <div v-for="row, rank in chessBoard.squares" :key="rank" class="row g-0 board-rank">
         <div v-for="piece, file in row" :id="`square-${file.toString() + (7-rank)}`" :key="file * 10 + rank" class="col board-square">
-          <div v-if="piece != null" :class="piece" @click="squareClick" />
-          <div v-else @click="squareClick" />
+          <div :class="piece" @click="squareClick" />
         </div>
       </div>
     </div>

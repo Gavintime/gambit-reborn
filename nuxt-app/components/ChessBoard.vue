@@ -61,7 +61,7 @@ class ChessBoard {
     }
   }
 
-  clearBoard (): this {
+  private clearBoard (): this {
     this.squares.forEach((row, rowIndex, squaresArray) => {
       row.forEach((_, colIndex) => {
         squaresArray[rowIndex][colIndex] = null
@@ -76,10 +76,14 @@ class ChessBoard {
   }
 
   // does not do move validation
-  movePiece (startFile: File, startRank: Rank, endFile: File, endRank: Rank): void {
+  movePiece (startFile: File, startRank: Rank, endFile: File, endRank: Rank): this {
     const tempPiece = this.squares[startRank][startFile]
     this.setSquare(null, startFile, startRank)
     this.setSquare(tempPiece, endFile, endRank)
+
+    this.turn = this.turn === 'WHITE' ? 'BLACK' : 'WHITE'
+
+    return this
   }
 
   setStartBoard (): this {
@@ -116,8 +120,15 @@ class ChessBoard {
 }
 
 const chessBoard = reactive(new ChessBoard())
-chessBoard.setStartBoard()
-chessBoard.movePiece(File.E, Rank.r2, File.E, Rank.r4)
+chessBoard
+  .setStartBoard()
+  .movePiece(File.E, Rank.r2, File.E, Rank.r4)
+  .movePiece(File.E, Rank.r7, File.E, Rank.r5)
+  .movePiece(File.G, Rank.r1, File.F, Rank.r3)
+  .movePiece(File.B, Rank.r8, File.C, Rank.r6)
+  .movePiece(File.D, Rank.r2, File.D, Rank.r4)
+  .movePiece(File.E, Rank.r5, File.D, Rank.r4)
+  .movePiece(File.F, Rank.r3, File.D, Rank.r4)
 
 </script>
 
@@ -130,6 +141,7 @@ chessBoard.movePiece(File.E, Rank.r2, File.E, Rank.r4)
         </div>
       </div>
     </div>
+    <h3>{{ chessBoard.turn }} to move</h3>
   </div>
 </template>
 

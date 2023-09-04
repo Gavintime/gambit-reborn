@@ -38,13 +38,10 @@ enum Piece {
   WhiteRook = 'wR'
 }
 
-type Square = {
-  piece: Piece | null
-  rank: Rank
-  file: File
-}
+type Square = Piece | null
 
 class ChessBoard {
+  // 8x8
   squares: Square[][]
   turn: 'WHITE' | 'BLACK' = 'WHITE'
   whiteCastle = true
@@ -59,18 +56,30 @@ class ChessBoard {
       this.squares[i] = []
       // create squares
       for (let j = 0; j < 8; j++) {
-        this.squares[i][j] = {
-          piece: null,
-          rank: i,
-          file: j
-        }
+        this.squares[i][j] = null
       }
     }
   }
 
-  private setSquare (piece: Piece | null, rank: Rank, file: File): this {
-    this.squares[rank][file].piece = piece
+  clearBoard (): this {
+    this.squares.forEach((row, rowIndex, squaresArray) => {
+      row.forEach((_, colIndex) => {
+        squaresArray[rowIndex][colIndex] = null
+      })
+    })
     return this
+  }
+
+  private setSquare (piece: Piece | null, file: File, rank: Rank): this {
+    this.squares[rank][file] = piece
+    return this
+  }
+
+  // does not do move validation
+  movePiece (startFile: File, startRank: Rank, endFile: File, endRank: Rank): void {
+    const tempPiece = this.squares[startRank][startFile]
+    this.setSquare(null, startFile, startRank)
+    this.setSquare(tempPiece, endFile, endRank)
   }
 
   setStartBoard (): this {
@@ -78,30 +87,29 @@ class ChessBoard {
     this.whiteCastle = true
     this.blackCastle = true
     this.enPassantSquare = null
-    // TODO: this needs to reset all squares
     this
-      .setSquare(Piece.WhiteRook, Rank.r1, File.A)
-      .setSquare(Piece.WhiteKnight, Rank.r1, File.B)
-      .setSquare(Piece.WhiteBishop, Rank.r1, File.C)
-      .setSquare(Piece.WhiteQueen, Rank.r1, File.D)
-      .setSquare(Piece.WhiteKing, Rank.r1, File.E)
-      .setSquare(Piece.WhiteBishop, Rank.r1, File.F)
-      .setSquare(Piece.WhiteKnight, Rank.r1, File.G)
-      .setSquare(Piece.WhiteRook, Rank.r1, File.H)
-
-      .setSquare(Piece.BlackRook, Rank.r8, File.A)
-      .setSquare(Piece.BlackKnight, Rank.r8, File.B)
-      .setSquare(Piece.BlackBishop, Rank.r8, File.C)
-      .setSquare(Piece.BlackQueen, Rank.r8, File.D)
-      .setSquare(Piece.BlackKing, Rank.r8, File.E)
-      .setSquare(Piece.BlackBishop, Rank.r8, File.F)
-      .setSquare(Piece.BlackKnight, Rank.r8, File.G)
-      .setSquare(Piece.BlackRook, Rank.r8, File.H)
+      .clearBoard()
+      .setSquare(Piece.WhiteRook, File.A, Rank.r1)
+      .setSquare(Piece.WhiteKnight, File.B, Rank.r1)
+      .setSquare(Piece.WhiteBishop, File.C, Rank.r1)
+      .setSquare(Piece.WhiteQueen, File.D, Rank.r1)
+      .setSquare(Piece.WhiteKing, File.E, Rank.r1)
+      .setSquare(Piece.WhiteBishop, File.F, Rank.r1)
+      .setSquare(Piece.WhiteKnight, File.G, Rank.r1)
+      .setSquare(Piece.WhiteRook, File.H, Rank.r1)
+      .setSquare(Piece.BlackRook, File.A, Rank.r8)
+      .setSquare(Piece.BlackKnight, File.B, Rank.r8)
+      .setSquare(Piece.BlackBishop, File.C, Rank.r8)
+      .setSquare(Piece.BlackQueen, File.D, Rank.r8)
+      .setSquare(Piece.BlackKing, File.E, Rank.r8)
+      .setSquare(Piece.BlackBishop, File.F, Rank.r8)
+      .setSquare(Piece.BlackKnight, File.G, Rank.r8)
+      .setSquare(Piece.BlackRook, File.H, Rank.r8)
 
     for (let file = 0; file < 8; file++) {
       this
-        .setSquare(Piece.WhitePawn, Rank.r2, file)
-        .setSquare(Piece.BlackPawn, Rank.r7, file)
+        .setSquare(Piece.WhitePawn, file, Rank.r2)
+        .setSquare(Piece.BlackPawn, file, Rank.r7)
     }
     return this
   }
@@ -109,14 +117,15 @@ class ChessBoard {
 
 const chessBoard = reactive(new ChessBoard())
 chessBoard.setStartBoard()
+chessBoard.movePiece(File.E, Rank.r2, File.E, Rank.r4)
 
 </script>
 
 <template>
   <div>
     <div class="container-fluid">
-      <div v-for="row in chessBoard.squares" :key="row[0].rank" class="row g-0 board-rank">
-        <div v-for="{piece, rank, file} in row" :key="file * 10 + rank" class="col board-square">
+      <div v-for="row, rank in chessBoard.squares" :id="`rank-${8 - rank}`" :key="rank" class="row g-0 board-rank">
+        <div v-for="piece, file in row" :id="`square-${String.fromCharCode(65 + file) + (8-rank)}`" :key="file * 10 + rank" class="col board-square">
           <div v-if="piece != null" :class="piece" />
         </div>
       </div>

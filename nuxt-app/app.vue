@@ -1,16 +1,18 @@
 <script setup>
-useSeoMeta({
-  title: 'Gambit Reborn',
-  description: 'Play Chess with friends online!',
+const appConfig = useAppConfig()
 
-  ogTitle: 'Gambit Reborn',
-  ogDescription: 'Play Chess with friends online!',
-  ogImage: '/favicon.ico',
+useSeoMeta({
+  title: appConfig.title,
+  description: appConfig.description,
+
+  ogTitle: appConfig.title,
+  ogDescription: appConfig.description,
+  ogImage: appConfig.icon,
   ogUrl: '[og:url]',
 
-  twitterTitle: 'Gambit Reborn',
-  twitterDescription: 'Play Chess with friends online!',
-  twitterImage: '/favicon.ico',
+  twitterTitle: appConfig.title,
+  twitterDescription: appConfig.description,
+  twitterImage: appConfig.icon,
   twitterCard: 'summary'
 })
 
@@ -20,7 +22,7 @@ useHead({
     {
       rel: 'icon',
       type: 'image/png',
-      href: '/favicon.ico'
+      href: appConfig.icon
     }
   ]
 })

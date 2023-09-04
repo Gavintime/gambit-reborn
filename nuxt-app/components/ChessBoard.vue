@@ -40,6 +40,11 @@ enum Piece {
 
 type Square = Piece | null
 
+type Coord = {
+  file: File | null
+  rank: Rank | null
+}
+
 class ChessBoard {
   // 8x8
   squares: Square[][]
@@ -119,25 +124,53 @@ class ChessBoard {
   }
 }
 
-const chessBoard = reactive(new ChessBoard())
-chessBoard
-  .setStartBoard()
-  .movePiece(File.E, Rank.r2, File.E, Rank.r4)
-  .movePiece(File.E, Rank.r7, File.E, Rank.r5)
-  .movePiece(File.G, Rank.r1, File.F, Rank.r3)
-  .movePiece(File.B, Rank.r8, File.C, Rank.r6)
-  .movePiece(File.D, Rank.r2, File.D, Rank.r4)
-  .movePiece(File.E, Rank.r5, File.D, Rank.r4)
-  .movePiece(File.F, Rank.r3, File.D, Rank.r4)
+function getCoordFromID (id: string): Coord {
+  return {
+    file: parseInt(id.charAt(7)),
+    rank: 7 - parseInt(id.charAt(8))
+  }
+}
 
+const srcSquare: Coord = reactive({
+  file: null,
+  rank: null
+})
+
+const chessBoard = reactive(new ChessBoard())
+chessBoard.setStartBoard()
+
+function squareClick (event: Event) {
+  // console.log((event.target as HTMLElement).parentElement?.id)
+  const id = (event.target as HTMLElement).parentElement?.id
+  if (id === undefined) {
+    return
+  }
+
+  const coord = getCoordFromID(id)
+  if (coord.file === null || coord.rank === null) {
+    return
+  }
+
+  // first click
+  if (srcSquare.file === null || srcSquare.rank === null) {
+    srcSquare.file = coord.file
+    srcSquare.rank = coord.rank
+    return
+  }
+
+  chessBoard.movePiece(srcSquare.file, srcSquare.rank, coord.file, coord.rank)
+  srcSquare.file = null
+  srcSquare.rank = null
+}
 </script>
 
 <template>
   <div>
     <div class="container-fluid">
-      <div v-for="row, rank in chessBoard.squares" :id="`rank-${8 - rank}`" :key="rank" class="row g-0 board-rank">
-        <div v-for="piece, file in row" :id="`square-${String.fromCharCode(65 + file) + (8-rank)}`" :key="file * 10 + rank" class="col board-square">
-          <div v-if="piece != null" :class="piece" />
+      <div v-for="row, rank in chessBoard.squares" :key="rank" class="row g-0 board-rank">
+        <div v-for="piece, file in row" :id="`square-${file.toString() + (7-rank)}`" :key="file * 10 + rank" class="col board-square">
+          <div v-if="piece != null" :class="piece" @click="squareClick" />
+          <div v-else @click="squareClick" />
         </div>
       </div>
     </div>

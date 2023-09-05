@@ -1,5 +1,7 @@
 <template>
   <div>
-    <ChessBoard />
+    <NuxtLink to="/newGame">
+      New Game
+    </NuxtLink>
   </div>
 </template>

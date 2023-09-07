@@ -1,0 +1,32 @@
+client
+	can create new game
+	can join game with invite code
+	maintain realtime connection with server while game is going on
+		for sending moves back and forth
+
+server
+	process request to create new game
+	open websocket connection for realtime game
+	orchestrate receiving and sending moves to and from players
+
+
+
+chess board component
+	renders a chessboard
+	reads user input (move making)
+	reads generalized input (server etc) (moves, fen, pgn?)
+
+
+
+Chessboard Data
+	8x8 grid
+		each index can contain a piece or not
+		indexable via File and Rank
+		iterable for rendering
+	castle rights
+	en passant square
+	turn
+
+Chessboard interations
+	move piece
+	set board to start or custom fen

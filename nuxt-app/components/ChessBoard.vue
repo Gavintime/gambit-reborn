@@ -9,7 +9,10 @@ const socket = io('ws://localhost:3001')
 
 const lastClientMoveMade = { color: 'b', moveNumber: 0 }
 
-socket.on('chess-move', (move) => {
+const inGame = ref(false)
+const userName = ref()
+
+socket.on('server-move', (move) => {
   // Received the opponents move
   if (chess.turn() === move.color && chess.moveNumber() === move.moveNumber) {
     // TODO: try catch this in case server sends illegal move/desync
@@ -25,6 +28,54 @@ socket.on('chess-move', (move) => {
     console.log(`SERVER MOVE: ${move.color} ${move.moveNumber}`)
   }
 })
+
+const gameCode = ref()
+
+function createGame () {
+
+  userName.value = 'user_w'
+
+  socket.emit('new-game',
+    {
+      code: gameCode.value,
+      // TODO: get from user
+      color: 'w',
+      userName: 'user_w'
+    },
+    (accepted: boolean) => {
+      if (!accepted) {
+        alert('COULD NOT CREATE GAME')
+        return
+      }
+      chess.reset()
+      chessBoardState.value = chess.board()
+      inGame.value = true
+    }
+  )
+}
+
+function joinGame () {
+
+  userName.value = 'user_b'
+
+  socket.emit('join-game',
+    {
+      code: gameCode.value,
+      // TODO: get from user
+      color: 'b',
+      userName: 'user_b'
+    },
+    (accepted: boolean) => {
+      if (!accepted) {
+        alert('COULD NOT JOIN GAME')
+        return
+      }
+      chess.reset()
+      chessBoardState.value = chess.board()
+      inGame.value = true
+    }
+  )
+}
 
 let srcSquare: string | null = null
 function squareClick (event: Event) {
@@ -47,11 +98,13 @@ function squareClick (event: Event) {
   }
 
   // send chess move to web socket server
-  socket.emit('chess-move',
+  socket.emit('make-move',
     {
       color: lastClientMoveMade.color,
       moveNumber: lastClientMoveMade.moveNumber,
-      move: srcSquare + square
+      move: srcSquare + square,
+      code: gameCode.value,
+      userName: userName.value
     },
     (accepted: boolean) => {
       if (!accepted) {
@@ -81,7 +134,23 @@ function squareClick (event: Event) {
         </div>
       </div>
     </div>
-    <h3>{{ chess.turn() === 'w' ? 'White' : 'Black' }} to move</h3>
+    <div v-if="inGame">
+      <h3>{{ chess.turn() === 'w' ? 'White' : 'Black' }} to move</h3>
+    </div>
+    <div v-else class="container">
+      <div class="input-group mb-3">
+        <input v-model="gameCode" class="form-control" type="text" placeholder="Invite Code">
+        <button class="btn btn-outline-secondary" type="button" @click="createGame">
+          Create New Game
+        </button>
+      </div>
+      <div class="input-group mb-3">
+        <input v-model="gameCode" class="form-control" type="text" placeholder="Invite Code">
+        <button class="btn btn-outline-secondary" type="button" @click="joinGame">
+          Join Game
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 

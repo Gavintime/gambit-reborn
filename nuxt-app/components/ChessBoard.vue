@@ -1,8 +1,30 @@
 <script setup lang="ts">
 import { Chess } from 'chess.js'
+import { io } from 'socket.io-client'
 
 const chess = new Chess()
 const chessBoardState = ref(chess.board())
+
+const socket = io('ws://localhost:3001')
+
+const lastClientMoveMade = { color: 'b', moveNumber: 0 }
+
+socket.on('chess-move', (move) => {
+  // Received the opponents move
+  if (chess.turn() === move.color && chess.moveNumber() === move.moveNumber) {
+    // TODO: try catch this in case server sends illegal move/desync
+    chess.move(move.move)
+    chessBoardState.value = chess.board()
+  // server verified our move
+  // TODO: verify actual moves are the same
+  } else if (lastClientMoveMade.color === move.color && lastClientMoveMade.moveNumber === move.moveNumber) {
+    console.log('Sever has verified our move')
+  } else {
+    console.log('WARNING: RECEIEVED MOVE FROM THE PAST/FUTURE!!!')
+    console.log(`CLIENT MOVE: ${chess.turn()} ${chess.moveNumber()}`)
+    console.log(`SERVER MOVE: ${move.color} ${move.moveNumber}`)
+  }
+})
 
 let srcSquare: string | null = null
 function squareClick (event: Event) {
@@ -14,11 +36,23 @@ function squareClick (event: Event) {
     return
   }
 
+  lastClientMoveMade.color = chess.turn()
+  lastClientMoveMade.moveNumber = chess.moveNumber()
   try {
     chess.move({ from: srcSquare, to: square })
   } catch (_) {
+    srcSquare = null
     alert('ILLEGAL MOVE! ')
+    return
   }
+
+  // send chess move to web socket server
+  socket.emit('chess-move',
+    {
+      color: lastClientMoveMade.color,
+      moveNumber: lastClientMoveMade.moveNumber,
+      move: srcSquare + square
+    })
 
   srcSquare = null
   chessBoardState.value = chess.board()

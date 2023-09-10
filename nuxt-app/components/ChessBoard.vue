@@ -108,6 +108,8 @@ function squareClick (event: Event) {
       (accepted: boolean) => {
         if (!accepted) {
           chess.undo()
+          // this needs to happen here since our emit runs asynchronously
+          chessBoardState.value = chess.board()
           alert('SERVER REJECTED MOVE')
         }
       }

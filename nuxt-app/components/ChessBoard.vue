@@ -18,7 +18,7 @@ socket.on('chess-move', (move) => {
   // server verified our move
   // TODO: verify actual moves are the same
   } else if (lastClientMoveMade.color === move.color && lastClientMoveMade.moveNumber === move.moveNumber) {
-    console.log('Sever has verified our move')
+    console.log('WARNING: SERVER SENT OUR OWN MOVE BACK TO US')
   } else {
     console.log('WARNING: RECEIEVED MOVE FROM THE PAST/FUTURE!!!')
     console.log(`CLIENT MOVE: ${chess.turn()} ${chess.moveNumber()}`)
@@ -52,7 +52,14 @@ function squareClick (event: Event) {
       color: lastClientMoveMade.color,
       moveNumber: lastClientMoveMade.moveNumber,
       move: srcSquare + square
-    })
+    },
+    (accepted: boolean) => {
+      if (!accepted) {
+        chess.undo()
+        alert('SERVER REJECTED MOVE')
+      }
+    }
+  )
 
   srcSquare = null
   chessBoardState.value = chess.board()

@@ -1,3 +1,7 @@
-./nuxt-app/.gitignore
-./nuxt-app/node_modules
+# common
+**/.gitignore
+**/node_modules
+**/Dockerfile
+
+# nuxt app
 ./nuxt-app/.nuxt

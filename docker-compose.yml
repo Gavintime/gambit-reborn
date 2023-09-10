@@ -1,6 +1,6 @@
 services:
-  node-app:
-    build: .
+  nuxt-app:
+    build: ./nuxt-app
     ports:
       - "3000:3000"
       # For hmr and other vite stuff
@@ -8,3 +8,9 @@ services:
     # TODO: remove for prod
     volumes:
       - ./nuxt-app:/srv/app
+
+  # TODO: HMR?
+  socket-app:
+    build: ./socket-app
+    ports:
+      - "3001:3001"

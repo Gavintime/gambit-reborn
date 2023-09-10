@@ -1,0 +1,9 @@
+{
+    "name": "gambit-socket-app",
+    "private": true,
+    "description": "the socket io server for Gambit Reborn's Chess game communication",
+    "type": "module",
+    "dependencies": {
+        "socket.io": "^4.7.2"
+    }
+}

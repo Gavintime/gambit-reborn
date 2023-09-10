@@ -32,7 +32,6 @@ socket.on('server-move', (move) => {
 const gameCode = ref()
 
 function createGame () {
-
   userName.value = 'user_w'
 
   socket.emit('new-game',
@@ -55,7 +54,6 @@ function createGame () {
 }
 
 function joinGame () {
-
   userName.value = 'user_b'
 
   socket.emit('join-game',
@@ -98,21 +96,23 @@ function squareClick (event: Event) {
   }
 
   // send chess move to web socket server
-  socket.emit('make-move',
-    {
-      color: lastClientMoveMade.color,
-      moveNumber: lastClientMoveMade.moveNumber,
-      move: srcSquare + square,
-      code: gameCode.value,
-      userName: userName.value
-    },
-    (accepted: boolean) => {
-      if (!accepted) {
-        chess.undo()
-        alert('SERVER REJECTED MOVE')
+  if (inGame.value) {
+    socket.emit('make-move',
+      {
+        color: lastClientMoveMade.color,
+        moveNumber: lastClientMoveMade.moveNumber,
+        move: srcSquare + square,
+        code: gameCode.value,
+        userName: userName.value
+      },
+      (accepted: boolean) => {
+        if (!accepted) {
+          chess.undo()
+          alert('SERVER REJECTED MOVE')
+        }
       }
-    }
-  )
+    )
+  }
 
   srcSquare = null
   chessBoardState.value = chess.board()

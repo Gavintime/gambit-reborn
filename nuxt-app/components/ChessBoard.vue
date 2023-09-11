@@ -81,7 +81,9 @@ function squareClick (event: Event) {
 
   // first click
   if (srcSquare.value === null) {
-    srcSquare.value = square
+    if (chess.get(square) && chess.get(square).color === chess.turn()) {
+      srcSquare.value = square
+    }
     return
   }
 

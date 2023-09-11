@@ -75,18 +75,18 @@ function joinGame () {
   )
 }
 
-let srcSquare: Square | null = null
+const srcSquare: Ref<Square | null> = ref(null)
 function squareClick (event: Event) {
   const square = (event.target as HTMLElement).parentElement!.id as Square
 
   // first click
-  if (srcSquare === null) {
-    srcSquare = square
+  if (srcSquare.value === null) {
+    srcSquare.value = square
     return
   }
 
   let promotionPiece: string | undefined
-  if (chess.get(srcSquare).type === 'p') {
+  if (chess.get(srcSquare.value).type === 'p') {
     if ((chess.turn() === 'w' && square[1] === '8') ||
         (chess.turn() === 'b' && square[1] === '1')) {
       // TODO: replace with a clickable ui element
@@ -102,9 +102,9 @@ function squareClick (event: Event) {
   lastClientMoveMade.color = chess.turn()
   lastClientMoveMade.moveNumber = chess.moveNumber()
   try {
-    chess.move({ from: srcSquare, to: square, promotion: promotionPiece })
+    chess.move({ from: srcSquare.value, to: square, promotion: promotionPiece })
   } catch (_) {
-    srcSquare = null
+    srcSquare.value = null
     alert('ILLEGAL MOVE! ')
     return
   }
@@ -130,7 +130,7 @@ function squareClick (event: Event) {
     )
   }
 
-  srcSquare = null
+  srcSquare.value = null
   chessBoardState.value = chess.board()
 }
 </script>
@@ -144,6 +144,7 @@ function squareClick (event: Event) {
           :id="String.fromCharCode(97 + file) + (8 - rank)"
           :key="String.fromCharCode(97 + file) + (8 - rank)"
           class="col board-square"
+          :class="{ selected: (String.fromCharCode(97 + file) + (8 - rank)) === srcSquare }"
         >
           <div v-if="piece" :class="piece.color + piece.type" @click="squareClick" />
           <div v-else @click="squareClick" />
@@ -178,6 +179,12 @@ function squareClick (event: Event) {
 .board-rank:nth-of-type(even) > .board-square:nth-of-type(even),
 .board-rank:nth-of-type(odd) > .board-square:nth-of-type(odd) {
   background: #f0d9b5;
+}
+
+.board-square.selected,
+.board-rank:nth-of-type(even) > .board-square:nth-of-type(even).selected,
+.board-rank:nth-of-type(odd) > .board-square:nth-of-type(odd).selected {
+  background: rgb(137, 202, 94);
 }
 
 .bb {background-image:url(~/assets/pieces/bB.svg);}

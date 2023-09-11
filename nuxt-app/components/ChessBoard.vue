@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Chess } from 'chess.js'
+import { Chess, Square } from 'chess.js'
 import { io } from 'socket.io-client'
 
 const chess = new Chess()
@@ -75,9 +75,9 @@ function joinGame () {
   )
 }
 
-let srcSquare: string | null = null
+let srcSquare: Square | null = null
 function squareClick (event: Event) {
-  const square = (event.target as HTMLElement).parentElement!.id
+  const square = (event.target as HTMLElement).parentElement!.id as Square
 
   // first click
   if (srcSquare === null) {
@@ -85,10 +85,24 @@ function squareClick (event: Event) {
     return
   }
 
+  let promotionPiece: string | undefined
+  if (chess.get(srcSquare).type === 'p') {
+    if ((chess.turn() === 'w' && square[1] === '8') ||
+        (chess.turn() === 'b' && square[1] === '1')) {
+      // TODO: replace with a clickable ui element
+      const piece = prompt('Please enter the piece type you would like to promote to:\nInvalid entries default to queen\nq r b n', 'q')
+      if (piece !== null && ['q', 'r', 'b', 'n'].includes(piece)) {
+        promotionPiece = piece
+      } else {
+        promotionPiece = 'q'
+      }
+    }
+  }
+
   lastClientMoveMade.color = chess.turn()
   lastClientMoveMade.moveNumber = chess.moveNumber()
   try {
-    chess.move({ from: srcSquare, to: square })
+    chess.move({ from: srcSquare, to: square, promotion: promotionPiece })
   } catch (_) {
     srcSquare = null
     alert('ILLEGAL MOVE! ')

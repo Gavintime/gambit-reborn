@@ -82,6 +82,7 @@ function squareClick (event: Event) {
   // first click
   if (srcSquare.value === null) {
     if (chess.get(square) && chess.get(square).color === chess.turn()) {
+      // TODO: server game side checks
       srcSquare.value = square
     }
     return
@@ -178,14 +179,15 @@ function squareClick (event: Event) {
   aspect-ratio: 1 / 1;
   background: #b58863;
 }
-.board-rank:nth-of-type(even) > .board-square:nth-of-type(even),
-.board-rank:nth-of-type(odd) > .board-square:nth-of-type(odd) {
+
+.board-rank:nth-of-type(even)>.board-square:nth-of-type(even),
+.board-rank:nth-of-type(odd)>.board-square:nth-of-type(odd) {
   background: #f0d9b5;
 }
 
 .board-square.selected,
-.board-rank:nth-of-type(even) > .board-square:nth-of-type(even).selected,
-.board-rank:nth-of-type(odd) > .board-square:nth-of-type(odd).selected {
+.board-rank:nth-of-type(even)>.board-square:nth-of-type(even).selected,
+.board-rank:nth-of-type(odd)>.board-square:nth-of-type(odd).selected {
   background: rgb(137, 202, 94);
 }
 
@@ -202,7 +204,7 @@ function squareClick (event: Event) {
 .wq {background-image:url(~/assets/pieces/wQ.svg);}
 .wr {background-image:url(~/assets/pieces/wR.svg);}
 
-.board-square > div {
+.board-square>div {
   height: 100%;
   width: auto;
   background-size: contain;

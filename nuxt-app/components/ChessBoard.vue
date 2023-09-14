@@ -75,21 +75,22 @@ function joinGame () {
   )
 }
 
-const srcSquare: Ref<Square | null> = ref(null)
+let srcSquare: Square | null = null
 function squareClick (event: Event) {
   const square = (event.target as HTMLElement).parentElement!.id as Square
 
   // first click
-  if (srcSquare.value === null) {
+  if (srcSquare === null) {
     if (chess.get(square) && chess.get(square).color === chess.turn()) {
       // TODO: server game side checks
-      srcSquare.value = square
+      srcSquare = square;
+      (event.target as HTMLElement).classList.add('selected')
     }
     return
   }
 
   let promotionPiece: string | undefined
-  if (chess.get(srcSquare.value).type === 'p') {
+  if (chess.get(srcSquare).type === 'p') {
     if ((chess.turn() === 'w' && square[1] === '8') ||
         (chess.turn() === 'b' && square[1] === '1')) {
       // TODO: replace with a clickable ui element
@@ -105,10 +106,10 @@ function squareClick (event: Event) {
   lastClientMoveMade.color = chess.turn()
   lastClientMoveMade.moveNumber = chess.moveNumber()
   try {
-    chess.move({ from: srcSquare.value, to: square, promotion: promotionPiece })
+    chess.move({ from: srcSquare, to: square, promotion: promotionPiece })
   } catch (_) {
-    srcSquare.value = null
-    alert('ILLEGAL MOVE! ')
+    srcSquare = null
+    alert('ILLEGAL MOVE!')
     return
   }
 
@@ -133,61 +134,68 @@ function squareClick (event: Event) {
     )
   }
 
-  srcSquare.value = null
+  srcSquare = null
   chessBoardState.value = chess.board()
 }
 </script>
 
 <template>
   <div>
-    <div class="container-fluid">
-      <div v-for="row, rank in chessBoardState" :key="rank" class="row g-0 board-rank">
+    <div class="chessboard">
+      <!-- this needs to be a template for griding to work -->
+      <template v-for="row, rank in chessBoardState" :key="rank">
         <div
           v-for="piece, file in row"
           :id="String.fromCharCode(97 + file) + (8 - rank)"
           :key="String.fromCharCode(97 + file) + (8 - rank)"
-          class="col board-square"
-          :class="{ selected: (String.fromCharCode(97 + file) + (8 - rank)) === srcSquare }"
+          class="chessboard__square"
         >
           <div v-if="piece" :class="piece.color + piece.type" @click="squareClick" />
           <div v-else @click="squareClick" />
         </div>
-      </div>
+      </template>
     </div>
-    <div v-if="inGame">
+
+    <template v-if="inGame">
       <h3>{{ chess.turn() === 'w' ? 'White' : 'Black' }} to move</h3>
-    </div>
-    <div v-else class="container">
-      <div class="input-group mb-3">
-        <input v-model="gameCode" class="form-control" type="text" placeholder="Invite Code">
-        <button class="btn btn-outline-secondary" type="button" @click="createGame">
-          Create New Game
-        </button>
-      </div>
-      <div class="input-group mb-3">
-        <input v-model="gameCode" class="form-control" type="text" placeholder="Invite Code">
-        <button class="btn btn-outline-secondary" type="button" @click="joinGame">
-          Join Game
-        </button>
-      </div>
-    </div>
+    </template>
+
+    <template v-else>
+      <input v-model="gameCode" type="text" placeholder="Invite Code">
+      <button type="button" @click="createGame">
+        Create New Game
+      </button>
+      <input v-model="gameCode" type="text" placeholder="Invite Code">
+      <button type="button" @click="joinGame">
+        Join Game
+      </button>
+    </template>
   </div>
 </template>
 
 <style>
-.board-square {
+.chessboard {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.chessboard__square {
   aspect-ratio: 1 / 1;
   background: #b58863;
 }
 
-.board-rank:nth-of-type(even)>.board-square:nth-of-type(even),
-.board-rank:nth-of-type(odd)>.board-square:nth-of-type(odd) {
+.chessboard__square:nth-of-type(16n + 1),
+.chessboard__square:nth-of-type(16n + 3),
+.chessboard__square:nth-of-type(16n + 5),
+.chessboard__square:nth-of-type(16n + 7),
+.chessboard__square:nth-of-type(16n + 10),
+.chessboard__square:nth-of-type(16n + 12),
+.chessboard__square:nth-of-type(16n + 14),
+.chessboard__square:nth-of-type(16n + 16) {
   background: #f0d9b5;
 }
 
-.board-square.selected,
-.board-rank:nth-of-type(even)>.board-square:nth-of-type(even).selected,
-.board-rank:nth-of-type(odd)>.board-square:nth-of-type(odd).selected {
+.selected {
   background: rgb(137, 202, 94);
 }
 
@@ -204,12 +212,11 @@ function squareClick (event: Event) {
 .wq {background-image:url(~/assets/pieces/wQ.svg);}
 .wr {background-image:url(~/assets/pieces/wR.svg);}
 
-.board-square>div {
+.chessboard__square>div {
   height: 100%;
   width: auto;
   background-size: contain;
   background-position: center;
-  /* background-size: 95%; */
   background-repeat: no-repeat;
 }
 </style>

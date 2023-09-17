@@ -15,7 +15,12 @@ const loggedIn = ref(false)
         </li>
         <li>
           <NuxtLink to="/newGame">
-            New Game
+            Play Online
+          </NuxtLink>
+        </li>
+        <li>
+          <NuxtLink to="/puzzles">
+            Puzzles
           </NuxtLink>
         </li>
         <li v-if="loggedIn">

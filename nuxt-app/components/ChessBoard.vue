@@ -177,6 +177,9 @@ function squareClick (event: Event) {
 .chessboard {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
+  /* TODO: once everything but the chessboard is removed from this component, remove both these and size it in the parent page */
+  width: clamp(20em, 75%, 70em);
+  margin: 0 auto;
 }
 
 .chessboard__square {

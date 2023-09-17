@@ -5,8 +5,7 @@ FROM node:20.5.1-alpine
 WORKDIR /srv/app
 
 # install node deps
-COPY --link ./package.json package.json
-COPY --link ./package-lock.json package-lock.json
+COPY --link ./package*.json .
 RUN npm install
 
 # copy over socket app files

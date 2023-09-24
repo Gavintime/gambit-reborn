@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "@tsconfig/recommended/tsconfig.json",
+    "@tsconfig/node20/tsconfig.json"
+  ],
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": [
+    "*.ts",
+    "routes/**/*",
+    "src/app.ts"
+  ]
+}

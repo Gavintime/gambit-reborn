@@ -1,3 +1,5 @@
 Error objs get JSONed to {} (when sending over socket io callback), which is useless
 
 hmr, nodemon?
+
+seperate ts build step into seperate intermediary container to reduse final container size

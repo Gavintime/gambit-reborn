@@ -10,7 +10,7 @@ services:
       - ./nuxt-app:/srv/app
 
   # TODO: HMR?
-  socket-app:
-    build: ./socket-app
+  express-app:
+    build: ./express-app
     ports:
       - "3001:3001"

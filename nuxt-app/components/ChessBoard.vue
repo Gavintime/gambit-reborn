@@ -41,9 +41,9 @@ function createGame () {
       color: 'w',
       userName: 'user_w'
     },
-    (accepted: boolean) => {
-      if (!accepted) {
-        alert('COULD NOT CREATE GAME')
+    (err: Error) => {
+      if (err) {
+        alert(err.message)
         return
       }
       chess.reset()
@@ -63,9 +63,9 @@ function joinGame () {
       color: 'b',
       userName: 'user_b'
     },
-    (accepted: boolean) => {
-      if (!accepted) {
-        alert('COULD NOT JOIN GAME')
+    (err: Error) => {
+      if (err) {
+        alert(err.message)
         return
       }
       chess.reset()
@@ -123,12 +123,12 @@ function squareClick (event: Event) {
         code: gameCode.value,
         userName: userName.value
       },
-      (accepted: boolean) => {
-        if (!accepted) {
+      (err: Error) => {
+        if (err) {
           chess.undo()
           // this needs to happen here since our emit runs asynchronously
           chessBoardState.value = chess.board()
-          alert('SERVER REJECTED MOVE')
+          alert(err.message)
         }
       }
     )

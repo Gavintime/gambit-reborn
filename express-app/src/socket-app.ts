@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
 
   socket.on('new-game', (newGameData, callback) => {
     if (newGameData.code in gameInstances) {
-      callback(false)
+      callback(new Error('Game already exists'))
       return
     }
 
@@ -26,14 +26,14 @@ io.on('connection', (socket) => {
       blackUserName: newGameData.color === 'b' ? newGameData.userName : null
     }
 
-    callback(true)
+    callback(null)
     console.log(`${newGameData.userName} has created a new game as ${newGameData.color}`)
-    socket.join(newGameData.code)
+    void socket.join(newGameData.code)
   })
 
   socket.on('join-game', (joinGameData, callback) => {
     if (!(joinGameData.code in gameInstances)) {
-      callback(false)
+      callback(new Error('Game does not exist'))
       console.log(`${joinGameData.userName} attempted to join the non existant game ${joinGameData.code}`)
       return
     }
@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
     // user is already in this game
     if (game.whiteUserName === joinGameData.userName ||
         game.blackUserName === joinGameData.userName) {
-      callback(false)
+      callback(new Error('You are already in this game'))
     }
 
     if (game.whiteUserName === null) {
@@ -51,20 +51,19 @@ io.on('connection', (socket) => {
     } else if (game.blackUserName === null) {
       game.blackUserName = joinGameData.userName
     } else {
-      callback(false)
+      callback(new Error('Game is full'))
       console.log(`${joinGameData.userName} attempted to join the full game game ${joinGameData.code}`)
     }
 
     // TODO: send notification to player 1 that a second player has joined
-    callback(true)
-    socket.join(joinGameData.code)
+    callback(null)
+    void socket.join(joinGameData.code)
   })
 
   socket.on('make-move', (moveData, callback) => {
-
     // invalid game code
     if (!(moveData.code in gameInstances)) {
-      callback(false)
+      callback(new Error('Invalid game code'))
       console.log('user tried making a move for a non existant game')
       return
     }
@@ -73,7 +72,7 @@ io.on('connection', (socket) => {
 
     // does not belong to this game
     if (![game.whiteUserName, game.blackUserName].includes(moveData.userName)) {
-      callback(false)
+      callback(new Error('You do not belong to this game'))
       console.log('user tried making a move for a game they dont belong to')
       return
     }
@@ -81,7 +80,7 @@ io.on('connection', (socket) => {
     // not the users turn
     if ((game.chess.turn() === 'w' && game.whiteUserName !== moveData.userName) ||
         (game.chess.turn() === 'b' && game.blackUserName !== moveData.userName)) {
-      callback(false)
+      callback(new Error('It is not your turn'))
       console.log(`${moveData.userName} tried sending a move when it's not their turn, or they are not apart of this game`)
       return
     }
@@ -90,13 +89,13 @@ io.on('connection', (socket) => {
       game.chess.move(moveData.move)
     } catch (_) {
       console.log(`${moveData.userName} attempted to make the illegal move ${moveData.moveNumber}.${moveData.move}`)
-      callback(false)
+      callback(new Error('Illegal move'))
       return
     }
 
     console.log(`${moveData.userName} has made the move ${moveData.moveNumber}.${moveData.move} in ${moveData.code}`)
     // tell client their move was accepted
-    callback(true)
+    callback(null)
     // emit to everyone in same room except sender
     socket.broadcast.to(moveData.code).emit('server-move', moveData)
   })

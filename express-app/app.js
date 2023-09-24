@@ -5,7 +5,7 @@ import logger from 'morgan';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 
-let app = express();
+const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());

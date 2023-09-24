@@ -1,5 +1,6 @@
 import { Router } from 'express';
-let router = Router();
+
+const router = Router();
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {

@@ -1,32 +1,39 @@
-client
-	can create new game
-	can join game with invite code
-	maintain realtime connection with server while game is going on
-		for sending moves back and forth
-
-server
-	process request to create new game
-	open websocket connection for realtime game
-	orchestrate receiving and sending moves to and from players
-
-
-
 chess board component
-	renders a chessboard
-	reads user input (move making)
-	reads generalized input (server etc) (moves, fen, pgn?)
-
-
-
-Chessboard Data
-	8x8 grid
-		each index can contain a piece or not
-		indexable via File and Rank
-		iterable for rendering
-	castle rights
-	en passant square
-	turn
+	reads generalized input (moves, fen, pgn?)
 
 Chessboard interations
-	move piece
-	set board to start or custom fen
+	set board to custom fen
+
+once game is over, server emmits result to both clients
+
+what the backend needs to do
+	store user/game Data
+
+
+
+
+
+
+components
+chess board - only renders the board and handles interacting with the board
+game info - only renders current game info (turn, player names, etc)
+invite code section - renders the form for creating/joining games
+
+composable - talks to server and supplies info to the components above
+
+
+
+chessboard
+	handles user interation (making client moves)
+	gets move from server from parent component
+
+gameinfo
+	gets turn, player names, etc from parent component
+
+
+
+
+db things to be stored
+accounts
+games
+puzzles?

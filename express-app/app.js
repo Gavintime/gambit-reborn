@@ -7,11 +7,13 @@ import usersRouter from './routes/users.js';
 
 const app = express();
 
+// global middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(compression());
 
+// routers
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

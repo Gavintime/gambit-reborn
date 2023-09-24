@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node ./dist/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint \"src/**\""
   },
   "dependencies": {
     "compression": "~1.7.4",

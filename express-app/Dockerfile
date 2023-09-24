@@ -11,5 +11,8 @@ RUN npm install
 # copy over socket app files
 COPY --link . .
 
-# start socket app
-CMD [ "node", "index.js" ]
+# build ts
+RUN npm run build
+
+# start api and socket io app
+CMD [ "npm", "run", "start" ]

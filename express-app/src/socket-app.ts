@@ -1,7 +1,7 @@
 import { Server } from 'socket.io'
 import { Chess } from 'chess.js'
 
-const io = new Server(3001, {
+const io = new Server({
   cors: {
     // nuxt app address
     origin: 'http://localhost:3000'
@@ -9,7 +9,7 @@ const io = new Server(3001, {
 })
 
 // stores a chess game, as well as players for each game
-const gameInstances = {}
+const gameInstances: any = {}
 
 io.on('connection', (socket) => {
   console.log('a user has connected')
@@ -102,4 +102,5 @@ io.on('connection', (socket) => {
   })
 })
 
-console.log('Socket IO Server Initialized')
+// console.log('Socket IO Server Initialized')
+export default io

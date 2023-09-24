@@ -1,0 +1,8 @@
+# common
+**/.gitignore
+**/node_modules
+**/Dockerfile
+**/.eslintrc
+
+# local build dir
+dist

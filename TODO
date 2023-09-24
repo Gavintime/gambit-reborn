@@ -37,3 +37,8 @@ db things to be stored
 accounts
 games
 puzzles?
+
+
+backend hmr, nodemon?
+
+seperate ts build step into seperate intermediary container to reduce final container size

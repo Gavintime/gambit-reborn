@@ -7,8 +7,6 @@
     "outDir": "dist"
   },
   "include": [
-    "*.ts",
-    "routes/**/*",
-    "src/app.ts"
+    "src/**/*"
   ]
 }

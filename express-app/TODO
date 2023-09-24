@@ -1,0 +1,3 @@
+Error objs get JSONed to {} (when sending over socket io callback), which is useless
+
+hmr, nodemon?

@@ -1,8 +1,7 @@
-#!/usr/bin/env node
-
-import app from '../app.js';
 import { default as Debug } from 'debug';
 import http from 'http';
+
+import app from './app.js';
 
 const debug = Debug('express-app:server');
 

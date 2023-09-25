@@ -34,11 +34,52 @@ gameinfo
 
 
 db things to be stored
-accounts
+users
+	userName
+	password?
+	games history
+	puzzles played
+	puzzle score
+	friends?
+	created datetime
 games
+	move list
+	datetime
+	white player
+	black player
+	result
 puzzles?
+	starting position (fen)
+	solution move list
+	points awarded for solving
 
 
 backend hmr, nodemon?
 
 seperate ts build step into seperate intermediary container to reduce final container size
+
+
+hosting options (avoid vendor lockin, so no firebase or similar)
+
+elastic beanstock - paas, choose runtime and deploy code, auto scaling
+elastic container service
+app runner - provide container img, auto orchistration and scaling
+
+
+rds
+aurora
+
+gcloud
+app engine flex
+cloud run
+
+
+the hard issue
+need websocket support in host provider (not using firebase realtime db for this project)
+if going serverless or auto scaling (basically anything not an ec2)
+	the websocket app should not be stateful (user could reconnect to a different instance)
+	this means the websocket server needs to sync with a realtime db (like redis) to maintain state over connections
+	for this project, this would mean syncing game state such as moves
+	so a single websocket app instance is not the only one with gameinfo while the game is in progress (before game finishs and game is stored in a perm db like mysql)
+
+	in short: a websocket app should only be responsible for the connection to the client, it should not be a source of truth (state) of a game

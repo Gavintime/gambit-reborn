@@ -14,3 +14,16 @@ services:
     build: ./express-app
     ports:
       - "3001:3001"
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    # TODO: MOVE ME TO ENV
+    environment:
+      - MYSQL_ROOT_PASSWORD=devpass
+    volumes:
+      - ./db/data:/var/lib/mysql
+    # TODO: we only need communication from other containers, not externally
+    ports:
+      - 3306:3306

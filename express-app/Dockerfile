@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 
-FROM node:20.5.1-alpine
+FROM node:20-alpine
 
 WORKDIR /srv/app
 
 # install node deps
+# TODO: production?
 COPY --link ./package*.json .
 RUN npm install
 
@@ -15,4 +16,4 @@ COPY --link . .
 RUN npm run build
 
 # start api and socket io app
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "dev" ]

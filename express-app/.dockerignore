@@ -2,7 +2,8 @@
 **/.gitignore
 **/node_modules
 **/Dockerfile
-**/.eslintrc
+**/.eslintrc.json
+**/prettierrc
 
 # local build dir
 dist

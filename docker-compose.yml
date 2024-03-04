@@ -1,15 +1,4 @@
 services:
-  nuxt-app:
-    build: ./nuxt-app
-    ports:
-      - "3000:3000"
-      # For hmr and other vite stuff
-      - "24678:24678"
-    # TODO: remove for prod
-    volumes:
-      - ./nuxt-app:/srv/app
-
-  # TODO: HMR?
   express-app:
     build: ./express-app
     ports:
@@ -17,7 +6,8 @@ services:
 
   db:
     image: mysql
-    command: --default-authentication-plugin=mysql_native_password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=caching_sha2_password
     restart: always
     # TODO: MOVE ME TO ENV
     environment:

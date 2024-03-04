@@ -1,0 +1,18 @@
+The goal of this project is to create a web Chess game.
+Core Features:
+    realtime online multiplayer
+    store games in a db
+    game search
+
+To support realtime multiplayer, 
+    a websocket (or similar) server will handle move communication with the client
+
+other functions such as game search and creating a game will be handled 
+    via a rest api hosted by an http server
+
+a relational database (probably mysql) will store game information
+    redis will be added down the line for quicker websock read/right
+
+the user client will be a web app
+
+client <=> (rest/ws server) <=> db

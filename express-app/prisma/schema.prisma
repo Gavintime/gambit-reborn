@@ -10,17 +10,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model games {
-  id          Int   @id @default(autoincrement())
-  whiteUser   users @relation(fields: [whiteUserId], references: [id], name: "white")
-  whiteUserId Int
-  blackUser   users @relation(fields: [blackUserId], references: [id], name: "black")
-  blackUserId Int
+model User {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  name         String   @unique @db.VarChar(12)
+  gamesAsWhite Game[]   @relation("white")
+  gamesAsBlack Game[]   @relation("black")
 }
 
-model users {
-  id           Int     @id @default(autoincrement())
-  username     String  @db.VarChar(255)
-  gamesAsWhite games[] @relation("white")
-  gamesAsBlack games[] @relation("black")
+model Game {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  finishedAt DateTime?
+  result     Result    @default(ONGOING)
+  plyCount   Int       @default(0)
+  white      User      @relation("white", fields: [whiteId], references: [id])
+  whiteId    Int
+  black      User      @relation("black", fields: [blackId], references: [id])
+  blackId    Int
+}
+
+enum Result {
+  WHITE_WON
+  BLACK_WON
+  TIE
+  ONGOING
 }

@@ -1,6 +1,8 @@
 services:
   express-app:
     build: ./express-app
+    environment:
+      - DATABASE_URL=mysql://root:devpass@db:3306/gambit
     ports:
       - "3001:3001"
 

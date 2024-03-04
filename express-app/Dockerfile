@@ -4,16 +4,18 @@ FROM node:20-alpine
 
 WORKDIR /srv/app
 
+# copy prisma schema, needed before dep install
+COPY ./prisma .
+
 # install node deps
-# TODO: production?
 COPY --link ./package*.json .
 RUN npm install
 
-# copy over socket app files
+# copy over app files
 COPY --link . .
 
 # build ts
 RUN npm run build
 
 # start api and socket io app
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "start" ]

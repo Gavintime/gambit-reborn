@@ -1,9 +1,8 @@
-# common
-**/.gitignore
-**/node_modules
-**/Dockerfile
-**/.eslintrc.json
-**/prettierrc
-
-# local build dir
 dist
+node_modules
+prisma/migrations
+.env
+.eslintrc.json
+.gitignore
+.prettierrc
+Dockerfile

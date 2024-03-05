@@ -14,8 +14,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "DEBUG=gambit:* node dist/server.js",
-    "dev": "tsc && DEBUG=gambit:* node dist/server.js",
-    "lint": "eslint \"src/**/*.ts\""
+    "dev": "DEBUG=gambit:* tsx watch src/server.ts",
+    "lint": "eslint \"src/**/*.ts\" && tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",
@@ -41,6 +41,7 @@
     "eslint-plugin-import": "^2.29.1",
     "prettier": "3.2.5",
     "prisma": "^5.10.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   }
 }

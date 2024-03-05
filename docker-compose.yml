@@ -5,6 +5,11 @@ services:
       - DATABASE_URL=mysql://root:devpass@db:3306/gambit
     ports:
       - "3001:3001"
+    command: npm run dev
+    volumes:
+      - ./express-app:/srv/app
+      # don't sync node modules
+      - /srv/app/node_modules
 
   db:
     image: mysql

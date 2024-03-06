@@ -28,6 +28,7 @@ model Game {
   whiteId    Int       @db.UnsignedInt
   black      User      @relation("black", fields: [blackId], references: [id])
   blackId    Int       @db.UnsignedInt
+  moves      String?   @db.Text
 }
 
 enum Result {

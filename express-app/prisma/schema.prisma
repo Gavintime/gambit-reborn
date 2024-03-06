@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
   createdAt    DateTime @default(now())
   name         String   @unique @db.VarChar(12)
   gamesAsWhite Game[]   @relation("white")
@@ -19,15 +19,15 @@ model User {
 }
 
 model Game {
-  id         Int       @id @default(autoincrement())
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
   createdAt  DateTime  @default(now())
   finishedAt DateTime?
   result     Result    @default(ONGOING)
-  plyCount   Int       @default(0)
+  plyCount   Int       @default(0) @db.UnsignedSmallInt
   white      User      @relation("white", fields: [whiteId], references: [id])
-  whiteId    Int
+  whiteId    Int       @db.UnsignedInt
   black      User      @relation("black", fields: [blackId], references: [id])
-  blackId    Int
+  blackId    Int       @db.UnsignedInt
 }
 
 enum Result {

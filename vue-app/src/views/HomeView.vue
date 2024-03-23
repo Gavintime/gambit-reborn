@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <h3>
+    Welcome to Gambit Reborn
+  </h3>
+  A place to play Chess with friends, record games, and solve puzzles!
 </template>

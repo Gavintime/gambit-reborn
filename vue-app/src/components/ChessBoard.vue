@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import WelcomeItem from './WelcomeItem.vue'
 import DocumentationIcon from './icons/IconDocumentation.vue'
 import ToolingIcon from './icons/IconTooling.vue'
@@ -85,4 +85,18 @@ import SupportIcon from './icons/IconSupport.vue'
     us by
     <a href="https://vuejs.org/sponsor/" target="_blank" rel="noopener">becoming a sponsor</a>.
   </WelcomeItem>
+</template> -->
+
+<script setup lang="ts">
+import { Chess } from 'chess.js'
+import { ref } from 'vue'
+
+
+</script>
+
+<template>
+  <div />
 </template>
+
+<style>
+</style>

@@ -2,8 +2,8 @@ import express from "express";
 import logger from "morgan";
 import compression from "compression";
 
-// import indexRouter from './routes/index.js'
 import userRouter from "./routes/user.js";
+import gameRouter from "./routes/game.js";
 
 const app = express();
 
@@ -15,5 +15,6 @@ app.use(compression());
 
 // routers
 app.use("/user", userRouter);
+app.use("/game", gameRouter);
 
 export default app;

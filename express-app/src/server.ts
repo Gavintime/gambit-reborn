@@ -1,7 +1,7 @@
 import Debug from "debug";
 import http from "node:http";
 import app from "./app.js";
-// import io from './socket-app.js'
+import io from './socket-app.js'
 
 /**
  * Normalize a port into a number, string, or false.
@@ -68,7 +68,7 @@ if (!port) {
 app.set("port", port);
 
 const server = http.createServer(app);
-// io.attach(server)
+io.attach(server)
 
 // Listen on provided port, on all network interfaces.
 server.listen(port);

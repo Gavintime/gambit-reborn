@@ -1,105 +1,201 @@
-// import { Server } from 'socket.io'
-// import { Chess } from 'chess.js'
+import Debug from "debug";
+import { Server } from "socket.io";
+import { Color, PieceSymbol, Square } from "chess.js";
+import GamesManager from "./lib/GamesManager.js";
 
-// const io = new Server({
-//   cors: {
-//     // nuxt app address
-//     origin: 'http://localhost:3000'
-//   }
-// })
+/** null when client requested action was successfull, otherwise error as string */
+type SocketCallback = (response: null | string) => void;
 
-// // stores a chess game, as well as players for each game
-// const gameInstances: any = {}
+interface ServerToClientEvents {
+  // noArg: () => void;
+  // basicEmit: (a: number, b: string, c: Buffer) => void;
+  // withAck: (d: string, callback: (e: number) => void) => void;
+  "game-started": () => void;
+  "move-made": (moveNumber: number, color: Color, move: string) => void;
+}
 
-// io.on('connection', (socket) => {
-//   console.log('a user has connected')
+interface ClientToServerEvents {
+  "new-game": (
+    inviteCode: string,
+    userName: string,
+    color: Color,
+    callback: SocketCallback,
+  ) => void;
+  "join-game": (
+    inviteCode: string,
+    userName: string,
+    callback: SocketCallback,
+  ) => void;
+  "make-move": (
+    gameCode: string,
+    userName: string,
+    from: Square,
+    to: Square,
+    promotion: PieceSymbol | null,
+    callback: SocketCallback,
+  ) => void;
+}
 
-//   socket.on('new-game', (newGameData, callback) => {
-//     if (newGameData.code in gameInstances) {
-//       callback(null, 'Game already exists')
-//       return
-//     }
+// TODO: validate against users in db
+function isValidUser(userName: string): boolean {
+  return userName.length >= 5;
+}
 
-//     gameInstances[newGameData.code] = {
-//       chess: new Chess(),
-//       whiteUserName: newGameData.color === 'w' ? newGameData.userName : null,
-//       blackUserName: newGameData.color === 'b' ? newGameData.userName : null
-//     }
+const debug = Debug("gambit:io");
 
-//     callback(null)
-//     console.log(`${newGameData.userName} has created a new game as ${newGameData.color}`)
-//     void socket.join(newGameData.code)
-//   })
+const gamesManager = GamesManager.Instance;
 
-//   socket.on('join-game', (joinGameData, callback) => {
-//     if (!(joinGameData.code in gameInstances)) {
-//       callback(null, 'Game does not exist')
-//       console.log(`${joinGameData.userName} attempted to join the non existant game ${joinGameData.code}`)
-//       return
-//     }
+const io = new Server<ClientToServerEvents, ServerToClientEvents>({
+  //   cors: {
+  //     // nuxt app address
+  //     origin: 'http://localhost:3000'
+  //   }
+});
 
-//     const game = gameInstances[joinGameData.code]
+io.on("connection", (socket) => {
+  console.log("a user has connected");
 
-//     // user is already in this game
-//     if (game.whiteUserName === joinGameData.userName ||
-//         game.blackUserName === joinGameData.userName) {
-//       callback(null, 'You\'re already in this game')
-//     }
+  // TODO: see what happens when we pass a number for the invite code
+  socket.on("new-game", (inviteCode, userName, color, callback) => {
+    if (!isValidUser(userName)) {
+      callback("Username is invalid");
+      return;
+    }
 
-//     if (game.whiteUserName === null) {
-//       game.whiteUserName = joinGameData.userName
-//     } else if (game.blackUserName === null) {
-//       game.blackUserName = joinGameData.userName
-//     } else {
-//       callback(null, 'Game is full')
-//       console.log(`${joinGameData.userName} attempted to join the full game game ${joinGameData.code}`)
-//     }
+    if (inviteCode.length !== 6) {
+      callback("Invite code is invalid");
+      return;
+    }
 
-//     // TODO: send notification to player 1 that a second player has joined
-//     callback(null)
-//     void socket.join(joinGameData.code)
-//   })
+    if (!["w", "b"].includes(color)) {
+      callback("Color is invalid");
+      return;
+    }
 
-//   socket.on('make-move', (moveData, callback) => {
-//     // invalid game code
-//     if (!(moveData.code in gameInstances)) {
-//       callback(null, 'Game does not exist')
-//       console.log('user tried making a move for a non existant game')
-//       return
-//     }
+    const gameAdded = gamesManager.addNewGame(inviteCode, userName, color);
 
-//     const game = gameInstances[moveData.code]
+    if (!gameAdded) {
+      callback("Game already exists");
+      return;
+    }
 
-//     // does not belong to this game
-//     if (![game.whiteUserName, game.blackUserName].includes(moveData.userName)) {
-//       callback(null, 'You arn\'t a player for this game')
-//       console.log('user tried making a move for a game they dont belong to')
-//       return
-//     }
+    callback(null);
+    const colorPretty = color === "w" ? "white" : "black";
+    debug(
+      `"${userName}" has created a new game "${inviteCode}" as ${colorPretty}`,
+    );
+    socket.join(inviteCode);
+  });
 
-//     // not the users turn
-//     if ((game.chess.turn() === 'w' && game.whiteUserName !== moveData.userName) ||
-//         (game.chess.turn() === 'b' && game.blackUserName !== moveData.userName)) {
-//       callback(null, 'It\'s not your turn')
-//       console.log(`${moveData.userName} tried sending a move when it's not their turn`)
-//       return
-//     }
+  socket.on("join-game", (inviteCode, userName, callback) => {
+    if (!isValidUser(userName)) {
+      callback("Username is invalid");
+      return;
+    }
 
-//     try {
-//       game.chess.move(moveData.move)
-//     } catch (_) {
-//       callback(null, 'Illegal move')
-//       console.log(`${moveData.userName} attempted to make the illegal move ${moveData.moveNumber}.${moveData.move}`)
-//       return
-//     }
+    if (inviteCode.length !== 6) {
+      callback("Invite code is invalid");
+      return;
+    }
 
-//     console.log(`${moveData.userName} has made the move ${moveData.moveNumber}.${moveData.move} in ${moveData.code}`)
-//     // tell client their move was accepted
-//     callback(null)
-//     // emit to everyone in same room except sender
-//     socket.broadcast.to(moveData.code).emit('server-move', moveData)
-//   })
-// })
+    const gameStatus = gamesManager.getGameStatus(inviteCode);
 
-// // console.log('Socket IO Server Initialized')
-// export default io
+    if (!gameStatus || gameStatus !== "WAITING_FOR_SECOND") {
+      callback("Game not found or unable to join");
+      return;
+    }
+
+    const colorAddedAs = gamesManager.addPlayerToGame(inviteCode, userName);
+
+    // This should never happen since we did the above check, just in case
+    if (!colorAddedAs) {
+      callback("Game not found or unable to join");
+      return;
+    }
+
+    callback(null);
+    socket.join(inviteCode);
+    // alerts both players
+    io.to(inviteCode).emit("game-started");
+  });
+
+  socket.on("make-move", (gameCode, userName, from, to, promotion, callback) => {
+
+    if (!isValidUser(userName)) {
+      callback("Username is invalid");
+      return;
+    }
+
+    const turnUser = gamesManager.getUserToPlay(gameCode);
+
+    if (!turnUser) {
+      callback("Game not found, or game is not ongoing");
+      return;
+    }
+
+    if (turnUser !== userName) {
+      callback("Not your turn");
+      return;
+    }
+
+    const result = gamesManager.makeMove(gameCode, from, to, promotion ?? undefined);
+
+    if (result === "INVALID_MOVE") {
+      callback("Invalid Move");
+      return;
+    }
+
+    const gameStatus = gamesManager.getGameStatus(gameCode);
+
+    if (!gameStatus) {
+      throw new Error("Could not find game, after verifying game exists");
+    }
+
+    // TODO:
+    if (gameStatus === "CHECKMATE") {
+      callback("");
+      return;
+    }
+
+    // const game = gameInstances[moveData.code];
+    // // does not belong to this game
+    // if (![game.whiteUserName, game.blackUserName].includes(moveData.userName)) {
+    //   callback(null, "You arn't a player for this game");
+    //   console.log("user tried making a move for a game they dont belong to");
+    //   return;
+    // }
+    // // not the users turn
+    // if (
+    //   (game.chess.turn() === "w" && game.whiteUserName !== moveData.userName) ||
+    //   (game.chess.turn() === "b" && game.blackUserName !== moveData.userName)
+    // ) {
+    //   callback(null, "It's not your turn");
+    //   console.log(
+    //     `${moveData.userName} tried sending a move when it's not their turn`,
+    //   );
+    //   return;
+    // }
+    // try {
+    //   game.chess.move(moveData.move);
+    // } catch (_) {
+    //   callback(null, "Illegal move");
+    //   console.log(
+    //     `${moveData.userName} attempted to make the illegal move ${moveData.moveNumber}.${moveData.move}`,
+    //   );
+    //   return;
+    // }
+    // console.log(
+    //   `${moveData.userName} has made the move ${moveData.moveNumber}.${moveData.move} in ${moveData.code}`,
+    // );
+    // // tell client their move was accepted
+    // callback(null);
+    // // emit to everyone in same room except sender
+    // socket.broadcast.to(moveData.code).emit("server-move", moveData);
+    // if (game.chess.isGameOver()) {
+    //   socket.emit("game-over", "TODO: OUTCOME");
+    // }
+  });
+});
+
+debug("Socket IO Server Initialized");
+export default io;

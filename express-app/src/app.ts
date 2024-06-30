@@ -17,4 +17,8 @@ app.use(compression());
 app.use("/user", userRouter);
 app.use("/game", gameRouter);
 
+app.use((req, res) => {
+  res.status(404).json("Endpoint not found");
+});
+
 export default app;

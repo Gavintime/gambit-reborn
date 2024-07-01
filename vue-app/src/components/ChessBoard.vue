@@ -1,20 +1,58 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { Chess } from "../Chess"
+import { IoClient } from "../IoClient"
 
 const boardElement = ref<HTMLElement | null>(null)
-let chess: Chess;
+let chess: Chess
+let ioClient: IoClient
+
+const inGame = ref<boolean>(false)
+const createCode = ref<string>('')
+const joinCode = ref<string>('')
+
+function createGame() {
+  console.log(createCode.value)
+  ioClient.newGame(createCode.value, 'user_w', 'w');
+}
+
+function joinGame() {
+
+}
 
 onMounted(() => {
-  if (boardElement.value) {
-    chess = new Chess(boardElement.value)
+  if (!boardElement.value) {
+    // TODO: site is broken if we get here
+    return;
   }
+
+  // constructor connects us to socket io server
+  ioClient = new IoClient();
+
+  chess = new Chess(boardElement.value, (lastMove) => {
+    ioClient.makeMove(lastMove);
+  })
 })
 </script>
 
 <template>
   <div class="chessground" ref="boardElement"></div>
-  <p>Player: replace me</p>
+
+  <template v-if="inGame">
+    <!-- <h3>{{ chess.turn() === 'w' ? 'White' : 'Black' }} to move</h3> -->
+  </template>
+
+  <!-- TODO: force 6 digits -->
+  <template v-else>
+    <input v-model="createCode" type="text" placeholder="Invite Code">
+    <button type="button" @click="createGame">
+      Create New Game
+    </button>
+    <input v-model="joinCode" type="text" placeholder="Invite Code">
+    <button type="button" @click="joinGame">
+      Join Game
+    </button>
+  </template>
 </template>
 
 <style>
@@ -26,6 +64,7 @@ onMounted(() => {
   aspect-ratio: 1/1;
 }
 
+/* TODO: move this to a real svg file*/
 /* 
  * https://github.com/lichess-org/chessground/issues/134#issuecomment-748545779 
  * the board background with lichess default colors

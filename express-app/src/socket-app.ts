@@ -11,7 +11,7 @@ interface ServerToClientEvents {
   // basicEmit: (a: number, b: string, c: Buffer) => void;
   // withAck: (d: string, callback: (e: number) => void) => void;
   "game-started": () => void;
-  "move-made": (moveNumber: number, color: Color, move: string) => void;
+  "game-state": (moveNumber: number, color: Color, move: string) => void;
 }
 
 interface ClientToServerEvents {
@@ -46,14 +46,16 @@ const debug = Debug("gambit:io");
 const gamesManager = GamesManager.Instance;
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>({
-  //   cors: {
-  //     // nuxt app address
-  //     origin: 'http://localhost:3000'
-  //   }
+  // TODO:
+    cors: {
+      // nuxt app address
+      // TODO: need to make vue app port static
+      origin: 'http://localhost:5173'
+    }
 });
 
 io.on("connection", (socket) => {
-  console.log("a user has connected");
+  debug("a user has connected");
 
   // TODO: see what happens when we pass a number for the invite code
   socket.on("new-game", (inviteCode, userName, color, callback) => {
@@ -119,82 +121,93 @@ io.on("connection", (socket) => {
     io.to(inviteCode).emit("game-started");
   });
 
-  socket.on("make-move", (gameCode, userName, from, to, promotion, callback) => {
+  socket.on(
+    "make-move",
+    (gameCode, userName, from, to, promotion, callback) => {
+      if (!isValidUser(userName)) {
+        callback("Username is invalid");
+        return;
+      }
 
-    if (!isValidUser(userName)) {
-      callback("Username is invalid");
-      return;
-    }
+      const turnUser = gamesManager.getUserToPlay(gameCode);
 
-    const turnUser = gamesManager.getUserToPlay(gameCode);
+      if (!turnUser) {
+        callback("Game not found, or game is not ongoing");
+        return;
+      }
 
-    if (!turnUser) {
-      callback("Game not found, or game is not ongoing");
-      return;
-    }
+      if (turnUser !== userName) {
+        callback("Not your turn");
+        return;
+      }
 
-    if (turnUser !== userName) {
-      callback("Not your turn");
-      return;
-    }
+      const result = gamesManager.makeMove(
+        gameCode,
+        from,
+        to,
+        promotion ?? undefined,
+      );
 
-    const result = gamesManager.makeMove(gameCode, from, to, promotion ?? undefined);
+      if (result === "INVALID_MOVE") {
+        callback("Invalid Move");
+        return;
+      }
 
-    if (result === "INVALID_MOVE") {
-      callback("Invalid Move");
-      return;
-    }
+      callback(null);
 
-    const gameStatus = gamesManager.getGameStatus(gameCode);
+      const gameStatus = gamesManager.getGameStatus(gameCode);
 
-    if (!gameStatus) {
-      throw new Error("Could not find game, after verifying game exists");
-    }
+      if (!gameStatus) {
+        throw new Error("Could not find game, after verifying game exists");
+      }
 
-    // TODO:
-    if (gameStatus === "CHECKMATE") {
-      callback("");
-      return;
-    }
+      // // TODO:
+      // if (gameStatus === "CHECKMATE") {
+      //   callback("");
+      //   return;
+      // }
 
-    // const game = gameInstances[moveData.code];
-    // // does not belong to this game
-    // if (![game.whiteUserName, game.blackUserName].includes(moveData.userName)) {
-    //   callback(null, "You arn't a player for this game");
-    //   console.log("user tried making a move for a game they dont belong to");
-    //   return;
-    // }
-    // // not the users turn
-    // if (
-    //   (game.chess.turn() === "w" && game.whiteUserName !== moveData.userName) ||
-    //   (game.chess.turn() === "b" && game.blackUserName !== moveData.userName)
-    // ) {
-    //   callback(null, "It's not your turn");
-    //   console.log(
-    //     `${moveData.userName} tried sending a move when it's not their turn`,
-    //   );
-    //   return;
-    // }
-    // try {
-    //   game.chess.move(moveData.move);
-    // } catch (_) {
-    //   callback(null, "Illegal move");
-    //   console.log(
-    //     `${moveData.userName} attempted to make the illegal move ${moveData.moveNumber}.${moveData.move}`,
-    //   );
-    //   return;
-    // }
-    // console.log(
-    //   `${moveData.userName} has made the move ${moveData.moveNumber}.${moveData.move} in ${moveData.code}`,
-    // );
-    // // tell client their move was accepted
-    // callback(null);
-    // // emit to everyone in same room except sender
-    // socket.broadcast.to(moveData.code).emit("server-move", moveData);
-    // if (game.chess.isGameOver()) {
-    //   socket.emit("game-over", "TODO: OUTCOME");
-    // }
-  });
+      io.to(gameCode).emit(gameStatus);
+
+      // const game = gameInstances[moveData.code];
+      // // does not belong to this game
+      // if (![game.whiteUserName, game.blackUserName].includes(moveData.userName)) {
+      //   callback(null, "You arn't a player for this game");
+      //   console.log("user tried making a move for a game they dont belong to");
+      //   return;
+      // }
+      // // not the users turn
+      // if (
+      //   (game.chess.turn() === "w" && game.whiteUserName !== moveData.userName) ||
+      //   (game.chess.turn() === "b" && game.blackUserName !== moveData.userName)
+      // ) {
+      //   callback(null, "It's not your turn");
+      //   console.log(
+      //     `${moveData.userName} tried sending a move when it's not their turn`,
+      //   );
+      //   return;
+      // }
+      // try {
+      //   game.chess.move(moveData.move);
+      // } catch (_) {
+      //   callback(null, "Illegal move");
+      //   console.log(
+      //     `${moveData.userName} attempted to make the illegal move ${moveData.moveNumber}.${moveData.move}`,
+      //   );
+      //   return;
+      // }
+      // console.log(
+      //   `${moveData.userName} has made the move ${moveData.moveNumber}.${moveData.move} in ${moveData.code}`,
+      // );
+      // // tell client their move was accepted
+      // callback(null);
+      // // emit to everyone in same room except sender
+      // socket.broadcast.to(moveData.code).emit("server-move", moveData);
+      // if (game.chess.isGameOver()) {
+      //   socket.emit("game-over", "TODO: OUTCOME");
+      // }
+    },
+  );
 });
 
 debug("Socket IO Server Initialized");

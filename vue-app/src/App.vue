@@ -7,9 +7,9 @@ import { RouterLink, RouterView } from 'vue-router'
     <nav>
       <RouterLink to="/">Gambit Reborn</RouterLink>
       <RouterLink to="/new-game">New Game</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
+      <!-- <RouterLink to="/about">About</RouterLink> -->
       <!-- TODO: check if logged in and show account page otherwise -->
-      <RouterLink to="/login">Login</RouterLink>
+      <!-- <RouterLink to="/login">Login</RouterLink> -->
     </nav>
   </header>
   <RouterView />

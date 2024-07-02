@@ -8,7 +8,7 @@ import { Chess as Chessjs, type Square } from 'chess.js'
 import { Chessground } from 'chessground'
 import type { Config } from 'chessground/config'
 import type { Api } from 'chessground/api'
-import * as cg from 'chessground/types'
+import type * as cg from 'chessground/types'
 
 export class Chess {
   private chessjs = new Chessjs()
@@ -16,60 +16,63 @@ export class Chess {
 
   constructor(
     boardElement: HTMLElement,
-    clientMoveCallback: (lastMove: string) => void
+    private customCallBack: (lastMove: string) => void
   ) {
     const initialGroundConfig: Config = {
       coordinates: false,
       movable: { free: false },
       events: {
-        move: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece): void => {
-          this.moveCallBack(orig, dest)
-          // TODO: fix tsconfig
-          const lastMove = this.chessjs.history({verbose: true}).at(-1).lan
-          clientMoveCallback(lastMove)
-        }
+        move: (orig: cg.Key, dest: cg.Key) => this.processGroundMove(orig, dest)
+        // move: this.processGroundMove
       }
     }
     this.ground = Chessground(boardElement, initialGroundConfig)
-    this.setGroundLegalMoves()
+    this.setGroundtoChessJs()
   }
 
   /**
-   * Sets the ground's moves to the current chessjs moves
+   * Sets chessground to the current chessjs fen, then sets legal ground moves
    */
-  private setGroundLegalMoves() {
-    const moveMap = new Map<Square, Square[]>()
-
-    const moves = this.chessjs.moves({ verbose: true })
-
-    for (const move of moves) {
-      if (!moveMap.has(move.from)) {
-        moveMap.set(move.from, [])
-      }
-      moveMap.get(move.from)!.push(move.to)
-    }
-
-    this.ground.set({ movable: { dests: moveMap } })
-  }
-
-  /**
-   * this syncs chess.js with chessground after the user makes a move using chessground
-   * 
-   * Returns the move notation from chess.js, this will be forwarded
-   */
-  private moveCallBack(orig: cg.Key, dest: cg.Key): void {
-    // TODO: assuming the user's move is already legal due to setGroundLegalMoves() restricting ground moves
-    this.chessjs.move({
-      from: orig,
-      to: dest,
-      // TODO: selectable promotion
-      promotion: 'q'
-    })
-
-    // TODO: move this to a universal "update ground" function?
-    // this is needed when promoting to set the promoted piece visual
+  private setGroundtoChessJs() {
     this.ground.set({ fen: this.chessjs.fen() })
 
-    this.setGroundLegalMoves()
+    const groundMoves = new Map<Square, Square[]>()
+    const chessJsMoves = this.chessjs.moves({ verbose: true })
+
+    for (const move of chessJsMoves) {
+      if (!groundMoves.has(move.from)) {
+        groundMoves.set(move.from, [])
+      }
+      groundMoves.get(move.from)!.push(move.to)
+    }
+
+    this.ground.set({ movable: { dests: groundMoves } })
+  }
+
+  /**
+   * Callback to process a move attempt from chessgrond.
+   *
+   * It validates the move attempt, updates chessjs and chessground, then calls the user's callback with move info.
+   */
+  private processGroundMove(orig: cg.Key, dest: cg.Key): void {
+    try {
+      this.chessjs.move({
+        from: orig,
+        to: dest,
+        // TODO: selectable promotion
+        promotion: 'q'
+      })
+    } catch (error) {
+      // illegal move, shouldn't happen since we restrict ground moves to legal moves, but just in case
+      return
+    } finally {
+      // update ground even if the user tried an illegal move
+      this.setGroundtoChessJs()
+    }
+
+    // not actually LAN, it's https://www.chessprogramming.org/Algebraic_Chess_Notation#Pure_coordinate_notation
+    const lastMove = this.chessjs.history({ verbose: true }).at(-1)!.lan
+
+    this.customCallBack(lastMove)
   }
 }

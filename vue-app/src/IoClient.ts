@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client'
-import type { Color, PieceSymbol, Square } from 'chess.js'
+import type { Color, Square } from 'chess.js'
 
 // TODO: put this in some shared location instead of copy pasting from the server
 type SocketCallback = (response: null | string) => void
@@ -20,8 +20,7 @@ interface ClientToServerEvents {
     userName: string,
     from: Square,
     to: Square,
-    // TODO: make custom type without king or pawn symbols
-    promotion: PieceSymbol | undefined,
+    promotion: 'b' | 'q' | 'n' | 'r' | undefined,
     callback: SocketCallback
   ) => void
 }
@@ -80,13 +79,9 @@ export class IoClient {
     })
   }
 
-  public makeMove(from: Square, to: Square, promotion: PieceSymbol | undefined) {
+  public makeMove(from: Square, to: Square, promotion: 'b' | 'q' | 'n' | 'r' | undefined) {
     if (!this.inGame) {
       throw new Error('Game has not started yet')
-    }
-
-    if (promotion === 'k' || promotion === 'p') {
-      throw new Error('Invalid promotion piece')
     }
 
     this.socket.emit(

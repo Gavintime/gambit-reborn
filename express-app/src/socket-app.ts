@@ -1,6 +1,6 @@
 import Debug from "debug";
 import { Server } from "socket.io";
-import { Color, PieceSymbol, Square } from "chess.js";
+import { Color, Square } from "chess.js";
 import GamesManager from "./lib/GamesManager.js";
 
 /** null when client requested action was successfull, otherwise error as string */
@@ -31,7 +31,7 @@ interface ClientToServerEvents {
     userName: string,
     from: Square,
     to: Square,
-    promotion: PieceSymbol | undefined,
+    promotion: "b" | "q" | "n" | "r" | undefined,
     callback: SocketCallback,
   ) => void;
 }

@@ -4,7 +4,7 @@
  */
 // TODO: disable moves when not the user's turn
 // TODO: account for endgame end states
-import { Chess as Chessjs, type PieceSymbol, type Square } from 'chess.js'
+import { Chess as Chessjs, type Square } from 'chess.js'
 import { Chessground } from 'chessground'
 import type { Config } from 'chessground/config'
 import type { Api } from 'chessground/api'
@@ -16,7 +16,11 @@ export class Chess {
 
   constructor(
     boardElement: HTMLElement,
-    private customCallBack: (from: Square, to: Square, promotion: PieceSymbol | undefined) => void
+    private customCallBack: (
+      from: Square,
+      to: Square,
+      promotion: 'b' | 'q' | 'n' | 'r' | undefined
+    ) => void
   ) {
     const initialGroundConfig: Config = {
       coordinates: false,

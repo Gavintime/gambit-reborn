@@ -1,7 +1,7 @@
-# common
 **/.gitignore
 **/node_modules
 **/Dockerfile
-
-# nuxt app
-./nuxt-app/.nuxt
+**/.vscode
+**/dist
+**/.prettierrc
+**/.prettierrc.json

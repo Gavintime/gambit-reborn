@@ -10,10 +10,7 @@ type GameStatus =
   | "DRAW"
   | "STALEMATE";
 
-type MoveAttemptOutcome =
-  | "INVALID_MOVE"
-  | "INVALID_GAME"
-  | "SUCCESS";
+type MoveAttemptOutcome = "INVALID_MOVE" | "INVALID_GAME" | "SUCCESS";
 
 /**
  * The data for an ongoing chess game
@@ -34,7 +31,7 @@ export default class GamesManager {
   private games: Map<string, GameData>;
 
   private constructor() {
-    this.games = new Map();
+    this.games = new Map<string, GameData>();
   }
 
   public static get Instance(): GamesManager {
@@ -161,5 +158,20 @@ export default class GamesManager {
     this.updateGameStatus(gameCode);
 
     return "SUCCESS";
+  }
+
+  // TODO: what do we want to send back to the client after each turn?
+  public getGameInfo(gameCode: string) {
+    const game = this.games.get(gameCode);
+
+    if (!game) {
+      return null;
+    }
+
+    return {
+      fen: game.chess.fen(),
+      colorToPlay: game.chess.turn(),
+      moves: game.chess.history(),
+    };
   }
 }

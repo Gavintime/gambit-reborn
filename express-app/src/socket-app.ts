@@ -11,7 +11,7 @@ interface ServerToClientEvents {
   // basicEmit: (a: number, b: string, c: Buffer) => void;
   // withAck: (d: string, callback: (e: number) => void) => void;
   "game-started": () => void;
-  "game-state": (moveNumber: number, color: Color, move: string) => void;
+  "game-state": (fen: string, colorToPlay: Color, moves: string[]) => void;
 }
 
 interface ClientToServerEvents {
@@ -139,12 +139,7 @@ io.on("connection", (socket) => {
         return;
       }
 
-      const result = gamesManager.makeMove(
-        gameCode,
-        from,
-        to,
-        promotion,
-      );
+      const result = gamesManager.makeMove(gameCode, from, to, promotion);
 
       if (result === "INVALID_MOVE") {
         callback("Invalid Move");
@@ -166,8 +161,14 @@ io.on("connection", (socket) => {
       //   return;
       // }
 
-      // TODO: provide real info
-      io.to(gameCode).emit("game-state", 1, "w", "somemove");
+      const gameInfo = gamesManager.getGameInfo(gameCode)!;
+
+      io.to(gameCode).emit(
+        "game-state",
+        gameInfo.fen,
+        gameInfo.colorToPlay,
+        gameInfo.moves,
+      );
 
       // const game = gameInstances[moveData.code];
       // // does not belong to this game

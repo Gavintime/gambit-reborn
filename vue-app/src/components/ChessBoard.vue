@@ -12,13 +12,13 @@ const createCode = ref<string>('')
 const joinCode = ref<string>('')
 
 function createGame() {
-  console.log(createCode.value)
   // TODO: username and color
   ioClient.newGame(createCode.value, 'user_w', 'w');
 }
 
 function joinGame() {
-
+  // TODO: username
+  ioClient.joinGame(joinCode.value, 'user_b')
 }
 
 onMounted(() => {

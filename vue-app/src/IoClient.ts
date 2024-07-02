@@ -9,7 +9,7 @@ interface ServerToClientEvents {
   // basicEmit: (a: number, b: string, c: Buffer) => void;
   // withAck: (d: string, callback: (e: number) => void) => void;
   'game-started': () => void
-  'game-state': (moveNumber: number, color: Color, move: string) => void
+  'game-state': (fen: string, colorToPlay: Color, moves: string[]) => void
 }
 
 interface ClientToServerEvents {
@@ -45,7 +45,7 @@ export class IoClient {
       this.inGame = true
     })
 
-    this.socket.on('game-state', (moveNumber, color, move) => {
+    this.socket.on('game-state', (fen: string, colorToPlay: Color, moves: string[]) => {
       // TODO: sink state with client (only if states are different)
     })
   }
@@ -58,6 +58,21 @@ export class IoClient {
     this.userName = userName
 
     this.socket.emit('new-game', inviteCode, userName, color, (response) => {
+      // TODO: rethink responses
+      if (response !== null) {
+        console.error(response)
+      }
+    })
+  }
+
+  /**
+   * Sends a request to the server to create a new game
+   */
+  public joinGame(inviteCode: string, userName: string) {
+    this.gameCode = inviteCode
+    this.userName = userName
+
+    this.socket.emit('join-game', inviteCode, userName, (response) => {
       // TODO: rethink responses
       if (response !== null) {
         console.error(response)

@@ -31,7 +31,7 @@ interface ClientToServerEvents {
     userName: string,
     from: Square,
     to: Square,
-    promotion: PieceSymbol | null,
+    promotion: PieceSymbol | undefined,
     callback: SocketCallback,
   ) => void;
 }
@@ -46,12 +46,10 @@ const debug = Debug("gambit:io");
 const gamesManager = GamesManager.Instance;
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>({
-  // TODO:
-    cors: {
-      // nuxt app address
-      // TODO: need to make vue app port static
-      origin: 'http://localhost:5173'
-    }
+  cors: {
+    // vue app address
+    origin: "http://localhost:5173",
+  },
 });
 
 io.on("connection", (socket) => {
@@ -153,6 +151,7 @@ io.on("connection", (socket) => {
         return;
       }
 
+      // move was successful
       callback(null);
 
       const gameStatus = gamesManager.getGameStatus(gameCode);
@@ -167,7 +166,8 @@ io.on("connection", (socket) => {
       //   return;
       // }
 
-      io.to(gameCode).emit(gameStatus);
+      // TODO: provide real info
+      io.to(gameCode).emit("game-state", 1, "w", "somemove");
 
       // const game = gameInstances[moveData.code];
       // // does not belong to this game

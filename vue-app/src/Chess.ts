@@ -4,7 +4,7 @@
  */
 // TODO: disable moves when not the user's turn
 // TODO: account for endgame end states
-import { Chess as Chessjs, type Square } from 'chess.js'
+import { Chess as Chessjs, type PieceSymbol, type Square } from 'chess.js'
 import { Chessground } from 'chessground'
 import type { Config } from 'chessground/config'
 import type { Api } from 'chessground/api'
@@ -16,7 +16,7 @@ export class Chess {
 
   constructor(
     boardElement: HTMLElement,
-    private customCallBack: (lastMove: string) => void
+    private customCallBack: (from: Square, to: Square, promotion: PieceSymbol | undefined) => void
   ) {
     const initialGroundConfig: Config = {
       coordinates: false,
@@ -55,12 +55,18 @@ export class Chess {
    * It validates the move attempt, updates chessjs and chessground, then calls the user's callback with move info.
    */
   private processGroundMove(orig: cg.Key, dest: cg.Key): void {
+    if (orig === 'a0' || dest === 'a0') {
+      throw new Error('Impossible chessground move ?!')
+    }
+
+    // TODO: check if promotion piece/square, then ask user for promotion piece
+    const promotion = 'q'
+
     try {
       this.chessjs.move({
         from: orig,
         to: dest,
-        // TODO: selectable promotion
-        promotion: 'q'
+        promotion: promotion
       })
     } catch (error) {
       // illegal move, shouldn't happen since we restrict ground moves to legal moves, but just in case
@@ -70,9 +76,6 @@ export class Chess {
       this.setGroundtoChessJs()
     }
 
-    // not actually LAN, it's https://www.chessprogramming.org/Algebraic_Chess_Notation#Pure_coordinate_notation
-    const lastMove = this.chessjs.history({ verbose: true }).at(-1)!.lan
-
-    this.customCallBack(lastMove)
+    this.customCallBack(orig, dest, promotion)
   }
 }

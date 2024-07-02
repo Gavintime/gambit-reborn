@@ -13,6 +13,7 @@ const joinCode = ref<string>('')
 
 function createGame() {
   console.log(createCode.value)
+  // TODO: username and color
   ioClient.newGame(createCode.value, 'user_w', 'w');
 }
 
@@ -22,15 +23,14 @@ function joinGame() {
 
 onMounted(() => {
   if (!boardElement.value) {
-    // TODO: site is broken if we get here
-    return;
+    throw new Error("Board element not ready");
   }
 
   // constructor connects us to socket io server
   ioClient = new IoClient();
 
-  chess = new Chess(boardElement.value, (lastMove) => {
-    ioClient.makeMove(lastMove);
+  chess = new Chess(boardElement.value, (from, to, promotion) => {
+    ioClient.makeMove(from, to, promotion);
   })
 })
 </script>

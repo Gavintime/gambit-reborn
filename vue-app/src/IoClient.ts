@@ -20,13 +20,17 @@ interface ClientToServerEvents {
     userName: string,
     from: Square,
     to: Square,
-    promotion: PieceSymbol | null,
+    // TODO: make custom type without king or pawn symbols
+    promotion: PieceSymbol | undefined,
     callback: SocketCallback
   ) => void
 }
 
 export class IoClient {
   private socket: Socket<ServerToClientEvents, ClientToServerEvents>
+  private gameCode: string | null = null
+  private userName: string | null = null
+  private inGame: boolean = false
 
   constructor() {
     this.socket = io('ws://localhost:3001')
@@ -37,6 +41,8 @@ export class IoClient {
 
     this.socket.on('game-started', () => {
       // TODO: reset board
+      console.log('game started')
+      this.inGame = true
     })
 
     this.socket.on('game-state', (moveNumber, color, move) => {
@@ -48,11 +54,39 @@ export class IoClient {
    * Sends a request to the server to create a new game
    */
   public newGame(inviteCode: string, userName: string, color: Color) {
+    this.gameCode = inviteCode
+    this.userName = userName
+
     this.socket.emit('new-game', inviteCode, userName, color, (response) => {
       // TODO: rethink responses
       if (response !== null) {
         console.error(response)
       }
     })
+  }
+
+  public makeMove(from: Square, to: Square, promotion: PieceSymbol | undefined) {
+    if (!this.inGame) {
+      throw new Error('Game has not started yet')
+    }
+
+    if (promotion === 'k' || promotion === 'p') {
+      throw new Error('Invalid promotion piece')
+    }
+
+    this.socket.emit(
+      'make-move',
+      // must be set if we are already in game
+      this.gameCode!,
+      this.userName!,
+      from,
+      to,
+      promotion,
+      (response) => {
+        if (response) {
+          throw new Error(response)
+        }
+      }
+    )
   }
 }

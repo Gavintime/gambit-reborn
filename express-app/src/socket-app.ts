@@ -143,7 +143,7 @@ io.on("connection", (socket) => {
         gameCode,
         from,
         to,
-        promotion ?? undefined,
+        promotion,
       );
 
       if (result === "INVALID_MOVE") {

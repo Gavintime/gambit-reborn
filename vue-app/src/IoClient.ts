@@ -9,7 +9,7 @@ interface ServerToClientEvents {
   // basicEmit: (a: number, b: string, c: Buffer) => void;
   // withAck: (d: string, callback: (e: number) => void) => void;
   'game-started': () => void
-  'game-state': (fen: string, colorToPlay: Color, moves: string[]) => void
+  'game-state': (fen: string, moves: string[]) => void
 }
 
 interface ClientToServerEvents {
@@ -31,7 +31,10 @@ export class IoClient {
   private userName: string | null = null
   private inGame: boolean = false
 
-  constructor() {
+  constructor(
+    gameStartedCallBack: () => void,
+    gameStateCallback: (fen: string, moves: string[]) => void
+  ) {
     this.socket = io('ws://localhost:3001')
 
     this.socket.on('connect', () => {
@@ -39,13 +42,13 @@ export class IoClient {
     })
 
     this.socket.on('game-started', () => {
-      // TODO: reset board
+      gameStartedCallBack()
       console.log('game started')
       this.inGame = true
     })
 
-    this.socket.on('game-state', (fen: string, colorToPlay: Color, moves: string[]) => {
-      // TODO: sink state with client (only if states are different)
+    this.socket.on('game-state', (fen: string, moves: string[]) => {
+      gameStateCallback(fen, moves)
     })
   }
 

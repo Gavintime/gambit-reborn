@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue"
 import { Chess } from "../Chess"
 import { IoClient } from "../IoClient"
+import type { Color } from "chess.js";
 
 const boardElement = ref<HTMLElement | null>(null)
 let chess: Chess
@@ -10,15 +11,23 @@ let ioClient: IoClient
 const inGame = ref<boolean>(false)
 const createCode = ref<string>('')
 const joinCode = ref<string>('')
+const color = ref<Color | null>(null)
 
 function createGame() {
   // TODO: username and color
   ioClient.newGame(createCode.value, 'user_w', 'w');
+  color.value = 'w'
 }
 
 function joinGame() {
-  // TODO: username
+  // TODO: username and color
   ioClient.joinGame(joinCode.value, 'user_b')
+  color.value = 'b'
+}
+
+// used by IoClient to sync with chessjs/chessground on new games
+function startNewGame() {
+  chess.startNewGame(color.value!)
 }
 
 onMounted(() => {
@@ -26,12 +35,15 @@ onMounted(() => {
     throw new Error("Board element not ready");
   }
 
-  // constructor connects us to socket io server
-  ioClient = new IoClient();
+  chess = new Chess(boardElement.value)
 
-  chess = new Chess(boardElement.value, (from, to, promotion) => {
-    ioClient.makeMove(from, to, promotion);
-  })
+  // constructor connects to socket io server
+  ioClient = new IoClient(
+    startNewGame,
+    (fen, moves) => chess.updateGameState(fen, moves)
+  );
+
+  chess.setClientMoveCallback((from, to, promotion) => ioClient.makeMove(from, to, promotion))
 })
 </script>
 

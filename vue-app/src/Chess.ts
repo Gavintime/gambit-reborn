@@ -4,33 +4,77 @@
  */
 // TODO: disable moves when not the user's turn
 // TODO: account for endgame end states
-import { Chess as Chessjs, type Square } from 'chess.js'
+import { Chess as Chessjs, type Color, type Square } from 'chess.js'
 import { Chessground } from 'chessground'
 import type { Config } from 'chessground/config'
 import type { Api } from 'chessground/api'
-import type * as cg from 'chessground/types'
+import type { Key } from 'chessground/types'
+
+type ClientCallBack = (
+  from: Square,
+  to: Square,
+  promotion: 'b' | 'q' | 'n' | 'r' | undefined
+) => void
 
 export class Chess {
   private chessjs = new Chessjs()
   private ground: Api
+  private playerColor: Color
+  /**
+   * This is called when the user makes legal a move on chessground
+   *
+   * Used by the IoClient to send the move to the server
+   */
+  private clientMoveCallback: ClientCallBack
 
-  constructor(
-    boardElement: HTMLElement,
-    private customCallBack: (
-      from: Square,
-      to: Square,
-      promotion: 'b' | 'q' | 'n' | 'r' | undefined
-    ) => void
-  ) {
+  constructor(boardElement: HTMLElement) {
+    // dummy callback until user sets it
+    this.clientMoveCallback = () => {}
+
+    this.playerColor = 'w'
+
     const initialGroundConfig: Config = {
       coordinates: false,
       movable: { free: false },
       events: {
-        move: (orig: cg.Key, dest: cg.Key) => this.processGroundMove(orig, dest)
+        move: (orig: Key, dest: Key) => this.processGroundMove(orig, dest)
         // move: this.processGroundMove
       }
     }
     this.ground = Chessground(boardElement, initialGroundConfig)
+    this.startNewGame()
+  }
+
+  /**
+   * Sets chessground and chessjs to a new game
+   * @param color sets which side the chess board should face, defaults to white pov
+   */
+  public startNewGame(color: Color = 'w') {
+    this.chessjs.reset()
+    this.setGroundtoChessJs()
+
+    this.playerColor = color
+    if (color !== 'w') {
+      this.ground.toggleOrientation()
+    }
+  }
+
+  public setClientMoveCallback(callback: ClientCallBack) {
+    this.clientMoveCallback = callback
+  }
+
+  /**
+   * Applies the given info to the current game state
+   *
+   * This is used as a callback whenever IoClient gets game state
+   */
+  public updateGameState(fen: string, moves: string[]): void {
+    if (this.chessjs.fen() === fen) {
+      console.warn('got duplicate game state data')
+      return
+    }
+
+    this.chessjs.load(fen)
     this.setGroundtoChessJs()
   }
 
@@ -39,6 +83,12 @@ export class Chess {
    */
   private setGroundtoChessJs() {
     this.ground.set({ fen: this.chessjs.fen() })
+
+    // don't populate any moves if it's not the players turn
+    if (this.playerColor !== this.chessjs.turn()) {
+      this.ground.set({ movable: { dests: new Map() } })
+      return
+    }
 
     const groundMoves = new Map<Square, Square[]>()
     const chessJsMoves = this.chessjs.moves({ verbose: true })
@@ -58,7 +108,7 @@ export class Chess {
    *
    * It validates the move attempt, updates chessjs and chessground, then calls the user's callback with move info.
    */
-  private processGroundMove(orig: cg.Key, dest: cg.Key): void {
+  private processGroundMove(orig: Key, dest: Key): void {
     if (orig === 'a0' || dest === 'a0') {
       throw new Error('Impossible chessground move ?!')
     }
@@ -80,6 +130,6 @@ export class Chess {
       this.setGroundtoChessJs()
     }
 
-    this.customCallBack(orig, dest, promotion)
+    this.clientMoveCallback(orig, dest, promotion)
   }
 }

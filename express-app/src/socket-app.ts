@@ -11,7 +11,7 @@ interface ServerToClientEvents {
   // basicEmit: (a: number, b: string, c: Buffer) => void;
   // withAck: (d: string, callback: (e: number) => void) => void;
   "game-started": () => void;
-  "game-state": (fen: string, colorToPlay: Color, moves: string[]) => void;
+  "game-state": (fen: string, moves: string[]) => void;
 }
 
 interface ClientToServerEvents {
@@ -163,12 +163,7 @@ io.on("connection", (socket) => {
 
       const gameInfo = gamesManager.getGameInfo(gameCode)!;
 
-      io.to(gameCode).emit(
-        "game-state",
-        gameInfo.fen,
-        gameInfo.colorToPlay,
-        gameInfo.moves,
-      );
+      io.to(gameCode).emit("game-state", gameInfo.fen, gameInfo.moves);
 
       // const game = gameInstances[moveData.code];
       // // does not belong to this game

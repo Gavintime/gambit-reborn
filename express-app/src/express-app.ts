@@ -2,19 +2,20 @@ import express from "express";
 import logger from "morgan";
 import compression from "compression";
 
-import userRouter from "./routes/user.js";
+// import userRouter from "./routes/user.js";
 import gameRouter from "./routes/game.js";
 
 const app = express();
 
 // global middleware
 app.use(logger("dev"));
+// TODO: handle invalid json in request, rn is sends a stacktrace to the user... 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(compression());
 
 // routers
-app.use("/user", userRouter);
+// app.use("/user", userRouter);
 app.use("/game", gameRouter);
 
 app.use((req, res) => {

@@ -35,33 +35,25 @@ router.get("/:id(\\d+)", async (req, res) => {
   res.json(game);
 });
 
+// create new game
 router.post("/", async (req, res) => {
+  if (!req.body.whiteId && !req.body.blackId) {
+    res.status(400).json("a player id is required to create a new game");
+    return;
+  }
+
   const game = await prisma.game.create({
     data: {
-      plyCount: req.body.plyCount,
-      result: req.body.result,
-      whiteId: req.body.whiteId,
-      blackId: req.body.blackId,
+      white: req.body.whiteId
+        ? { connect: { id: req.body.whiteId } }
+        : undefined,
+      black: req.body.blackId
+        ? { connect: { id: req.body.blackId } }
+        : undefined,
     },
   });
 
-  res.json(game);
-});
-
-router.post("/test", async (req, res) => {
-  const chess = new Chess();
-  while (!chess.isGameOver()) {
-    const moves = chess.moves();
-    const randomMove = moves[Math.floor(Math.random() * moves.length)];
-    chess.move(randomMove);
-  }
-
-  const history = chess.history().join(" ");
-
-  res.json({
-    pgnString: history,
-    pgnStringLength: history.length,
-  });
+  res.json({ gameId: game.id });
 });
 
 export default router;

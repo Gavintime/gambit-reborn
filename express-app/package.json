@@ -18,7 +18,7 @@
     "lint": "eslint \"src/**/*.ts\" && tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "^5.10.2",
+    "@prisma/client": "^5.16.2",
     "chess.js": "^1.0.0-beta.8",
     "compression": "^1.7.4",
     "debug": "^4.3.4",
@@ -42,7 +42,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "prettier": "3.2.5",
-    "prisma": "^5.10.2",
+    "prisma": "^5.16.2",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   }

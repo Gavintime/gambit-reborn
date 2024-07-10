@@ -24,10 +24,10 @@ model Game {
   finishedAt DateTime?
   result     Result    @default(ONGOING)
   plyCount   Int       @default(0) @db.UnsignedSmallInt
-  white      User      @relation("white", fields: [whiteId], references: [id])
-  whiteId    Int       @db.UnsignedInt
-  black      User      @relation("black", fields: [blackId], references: [id])
-  blackId    Int       @db.UnsignedInt
+  white      User?      @relation("white", fields: [whiteId], references: [id])
+  whiteId    Int?       @db.UnsignedInt
+  black      User?      @relation("black", fields: [blackId], references: [id])
+  blackId    Int?       @db.UnsignedInt
   moves      String?   @db.Text
 }
 

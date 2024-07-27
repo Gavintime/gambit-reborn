@@ -18,22 +18,24 @@ model User {
   gamesAsBlack Game[]   @relation("black")
 }
 
+// immutable finished games, in progress games are store in redis (maybe in the future allow long form games that are stored in this db)
 model Game {
-  id         Int       @id @default(autoincrement()) @db.UnsignedInt
-  createdAt  DateTime  @default(now())
-  finishedAt DateTime?
-  result     Result    @default(ONGOING)
-  plyCount   Int       @default(0) @db.UnsignedSmallInt
-  white      User?      @relation("white", fields: [whiteId], references: [id])
-  whiteId    Int?       @db.UnsignedInt
-  black      User?      @relation("black", fields: [blackId], references: [id])
-  blackId    Int?       @db.UnsignedInt
-  moves      String?   @db.Text
+  id         Int        @id @default(autoincrement()) @db.UnsignedInt
+  createdAt  DateTime
+  finishedAt DateTime
+  result     GameResult
+  plyCount   Int        @db.UnsignedSmallInt
+  white      User       @relation("white", fields: [whiteId], references: [id])
+  whiteId    Int        @db.UnsignedInt
+  black      User       @relation("black", fields: [blackId], references: [id])
+  blackId    Int        @db.UnsignedInt
+  moves      String     @db.Text
 }
 
-enum Result {
+// TODO: revisit once timers are added
+enum GameResult {
   WHITE_WON
   BLACK_WON
+  // forced tie, agree to draw, etc
   TIE
-  ONGOING
 }

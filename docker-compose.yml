@@ -2,16 +2,18 @@ services:
   express-app:
     build: ./express-app
     environment:
-      - DATABASE_URL=mysql://root:devpass@db:3306/gambit
+      - DATABASE_URL=mysql://root:devpass@mysql-db:3306/gambit
+      - REDIS_HOST=redis-db
+      - REDIS_PORT=6379
     ports:
-      - "3001:3001"
+      - 3001:3001
     command: npm run dev
     volumes:
       - ./express-app:/srv/app
       # don't sync node modules
       - /srv/app/node_modules
 
-  db:
+  mysql-db:
     image: mysql
     # (this is just an example, not intended to be a production configuration)
     command: --default-authentication-plugin=caching_sha2_password
@@ -21,6 +23,10 @@ services:
       - MYSQL_ROOT_PASSWORD=devpass
     volumes:
       - ./db/data:/var/lib/mysql
-    # TODO: we only need communication from other containers, not externally
+    # this is only for dev work (workbench etc), not needed for app
     ports:
       - 3306:3306
+
+  redis-db:
+    image: redis:7.2
+    restart: always

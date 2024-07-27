@@ -3,7 +3,8 @@ import logger from "morgan";
 import compression from "compression";
 
 // import userRouter from "./routes/user.js";
-import gameRouter from "./routes/game.js";
+import gameRouter from "./routes/GameRouter.js";
+import inviteCodeRouter from "./routes/InviteCodeRouter.js"
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(compression());
 
 // routers
 // app.use("/user", userRouter);
+app.use("/invite-code", inviteCodeRouter)
 app.use("/game", gameRouter);
 
 app.use((req, res) => {

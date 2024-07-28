@@ -46,6 +46,41 @@ async function makeNewGameCode(
   return code;
 }
 
+/**
+ * @returns promise of: color
+ */
+async function addUserToGameCode(
+  userId: number,
+  inviteCode: string,
+): Promise<"w" | "b"> {
+  const gameStateString = await redisPub.get(`game-${inviteCode}`);
+
+  if (gameStateString === null) {
+    throw new Error("Game not found");
+  }
+
+  const gameInfo: GameState = JSON.parse(gameStateString);
+
+  if (gameInfo.whiteUserId === userId || gameInfo.blackUserId === userId) {
+    throw new Error("Already in game");
+  }
+
+  let color: "w" | "b";
+  if (gameInfo.whiteUserId === null) {
+    gameInfo.whiteUserId = userId;
+    color = "w";
+  } else if (gameInfo.blackUserId === null) {
+    gameInfo.blackUserId = userId;
+    color = "b";
+  } else {
+    throw new Error("Game is full");
+  }
+
+  await redisPub.set(`game-${inviteCode}`, JSON.stringify(gameInfo));
+
+  return color;
+}
+
 // create new invite code
 router.post("/", async (req, res) => {
   // request body {"userName": STRING, "color": "w" or "b"}
@@ -53,15 +88,14 @@ router.post("/", async (req, res) => {
   const { userName, color } = req.body;
 
   // TODO: better request validation
-  if (!userName || typeof userName !== "string") {
-    // unauthorized
-    res.status(401).json("Invalid userName");
+  if (typeof userName !== "string") {
+    res.status(400).json("Invalid userName");
     return;
   }
 
   if (color !== "w" && color !== "b") {
     // bad request
-    res.status(404).json("Missing or invalid color choice");
+    res.status(400).json("Invalid color");
     return;
   }
 
@@ -71,7 +105,7 @@ router.post("/", async (req, res) => {
   });
   if (user === null) {
     // unauthorized
-    res.status(401).json("Invalid userName");
+    res.status(401).json("userName not found");
     return;
   }
 
@@ -81,126 +115,46 @@ router.post("/", async (req, res) => {
   res.json({ inviteCode: inviteCode, color: color });
 });
 
-// // join using an existing invite code
-// router.patch("/", async (req, res) => {
-//   // request body {"userName": STRING, "inviteCode": STRING}
+// join using an existing invite code
+router.patch("/", async (req, res) => {
+  // request body {"userName": STRING, "inviteCode": STRING}
+  const { userName, inviteCode } = req.body;
 
-//   const { userName, inviteCode } = req.body;
+  // TODO: better request validation
+  if (typeof userName !== "string") {
+    res.status(400).json("Invalid UserName");
+    return;
+  }
 
-//   // TODO: better request validation
-//   if (!userName || typeof userName !== "string") {
-//     // unauthorized
-//     res.status(401).json("Invalid userName");
-//     return;
-//   }
+  if (
+    typeof inviteCode !== "string" ||
+    inviteCode.length !== INVITE_CODE_LENGTH
+  ) {
+    res.status(400).json("Invalid inviteCode");
+    return;
+  }
 
-//   if (
-//     !inviteCode ||
-//     typeof inviteCode !== "string" ||
-//     inviteCode.length !== INVITE_CODE_LENGTH
-//   ) {
-//   }
-// });
+  // verify user exists (call mysql db)
+  const user = await prisma.user.findUnique({
+    where: { name: userName },
+  });
+  if (user === null) {
+    // unauthorized
+    res.status(401).json("userName not found");
+    return;
+  }
 
-// get game info
-// router.get("/:id(\\d+)", async (req, res) => {
-//   const { id } = req.params;
-//   const idInt = parseInt(id, 10);
-//   if (idInt > Number.MAX_SAFE_INTEGER) {
-//     res.status(400).json("Invalid Game id");
-//     return;
-//   }
+  let color;
+  try {
+    color = await addUserToGameCode(user.id, inviteCode);
+    // TODO: filter error types instead of any?
+    // game not found, already in game, game is full
+  } catch (error: any) {
+    res.status(400).json(error.message);
+    return;
+  }
 
-//   let game;
-//   try {
-//     game = await prisma.game.findUnique({
-//       where: {
-//         id: idInt,
-//       },
-//     });
-//   } catch (error) {
-//     res.status(500).json("Internal Error");
-//     debug(error);
-//     return;
-//   }
-
-//   if (game === null) {
-//     res.status(404).json(`Game: ${id} doesn't exist.`);
-//     return;
-//   }
-
-//   res.json(game);
-// });
-
-// store finished game in db, only called internally by socket io server
-// router.post("/", async (req, res) => {
-//   // TODO: check all required fields
-//   // if (!req.body.whiteId && !req.body.blackId) {
-//   //   res.status(400).json("a player id is required to create a new game");
-//   //   return;
-//   // }
-
-//   const game = await prisma.game.create({
-//     data: {
-//       white: req.body.whiteId
-//         ? { connect: { id: req.body.whiteId } }
-//         : undefined,
-//       black: req.body.blackId
-//         ? { connect: { id: req.body.blackId } }
-//         : undefined,
-//     },
-//   });
-
-//   res.json({ gameId: game.id });
-// });
-
-// join game from invite game code
-// router.put("/join", async (req, res) => {
-//   // check input
-//   if (!req.body.userId) {
-//     res.status(400).json("a playerId is required to join a game");
-//     return;
-//   }
-
-//   if (!req.body.gameId) {
-//     res.status(400).json("a gameId is required to join a game");
-//     return;
-//   }
-
-//   // get game info and check if joinable
-//   const game = await prisma.game.findUnique({
-//     where: { id: req.body.gameId },
-//   });
-
-//   if (!game) {
-//     res.status(404).json("Game not found");
-//     return;
-//   }
-
-//   if (game.whiteId === req.body.userId || game.blackId === req.body.userId) {
-//     // TODO: what's the correct 4xx here, 409?
-//     res.status(400).json("Already in this game");
-//     return;
-//   }
-
-//   // find side to join, then update game in db with invited player
-//   let data;
-//   if (!game.whiteId) {
-//     data = { whiteId: req.body.userId };
-//   } else if (!game.blackId) {
-//     data = { blackId: req.body.userId };
-//   } else {
-//     // 409  = conflict
-//     res.status(409).json("Game is full");
-//     return;
-//   }
-
-//   const joinedGame = await prisma.game.update({
-//     where: { id: req.body.gameId },
-//     data,
-//   });
-
-//   res.json({ game: joinedGame });
-// });
+  res.json({ inviteCode: inviteCode, color: color });
+});
 
 export default router;

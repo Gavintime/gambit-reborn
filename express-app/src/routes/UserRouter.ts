@@ -1,5 +1,6 @@
 import { Router } from "express";
 import prisma from "../lib/prisma.js";
+import { createNewUser, getUser, isValidUserName } from "../lib/UserManager.js";
 
 const router = Router();
 
@@ -13,26 +14,19 @@ const router = Router();
 // });
 
 router.post("/", async (req, res) => {
-  const { name } = req.body;
+  const { userName } = req.body;
 
-  // TODO: better request validation
-  if (typeof name !== "string") {
+  if (typeof userName !== "string" || !isValidUserName(userName)) {
     res.status(400).json("Invalid userName");
     return;
   }
 
-  const existingUser = await prisma.user.findFirst({
-    where: { name: name },
-  });
-
-  if (existingUser !== null) {
-    res.status(400).json("Username taken");
+  if (await getUser(userName)) {
+    res.status(409).json("Username already taken");
     return;
   }
 
-  const newUser = await prisma.user.create({
-    data: { name: name },
-  });
+  const newUser = await createNewUser(userName);
 
   res.json(newUser);
 });

@@ -30,3 +30,6 @@ services:
   redis-db:
     image: redis:7.2
     restart: always
+    ports:
+      # only needed for dev work
+      - 6379:6379

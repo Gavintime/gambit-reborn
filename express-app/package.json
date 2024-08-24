@@ -14,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "DEBUG=gambit:* node dist/server.js",
-    "dev": "DEBUG=gambit:* tsx watch src/server.ts",
+    "dev": "DEBUG=gambit:* tsx watch --inspect=0.0.0.0:9229 src/server.ts",
     "lint": "eslint \"src/**/*.ts\" && tsc --noEmit"
   },
   "dependencies": {

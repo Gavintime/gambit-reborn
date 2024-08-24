@@ -14,13 +14,13 @@ services:
       - /srv/app/node_modules
 
   mysql-db:
-    image: mysql
-    # (this is just an example, not intended to be a production configuration)
-    command: --default-authentication-plugin=caching_sha2_password
+    image: mysql:9.0
     restart: always
     # TODO: MOVE ME TO ENV
+    # (this is just an example, not intended to be a production configuration)
     environment:
-      - MYSQL_ROOT_PASSWORD=devpass
+      MYSQL_ROOT_PASSWORD: devpass
+      MYSQL_DATABASE: gambit
     volumes:
       - ./db/data:/var/lib/mysql
     # this is only for dev work (workbench etc), not needed for app

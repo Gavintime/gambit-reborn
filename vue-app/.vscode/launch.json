@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "vite debug",
             "url": "http://localhost:5173/",
-            "webRoot": "${workspaceFolder}/vue-app"
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }

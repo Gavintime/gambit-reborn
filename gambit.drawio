@@ -1,0 +1,107 @@
+<mxfile host="app.diagrams.net" modified="2024-07-27T17:30:20.618Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" etag="WgLhZmVP3cp3MJxIHx51" version="24.3.1" type="device">
+  <diagram name="Page-1" id="oFe2KGGvyUM_qv23aHH0">
+    <mxGraphModel dx="660" dy="943" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="2000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="PNa0oYaVAZ6Van3COsha-35" value="Gambit&lt;div&gt;Backend&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;spacingTop=-450;fontSize=21;" vertex="1" parent="1">
+          <mxGeometry x="860" y="150" width="660" height="570" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-1" value="&lt;div&gt;&lt;font style=&quot;font-size: 19px;&quot;&gt;Gambit Web App&amp;nbsp;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 19px;&quot;&gt;Frontend&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=13;spacingBottom=0;spacingTop=-400;" vertex="1" parent="1">
+          <mxGeometry x="210" y="180" width="480" height="490" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-2" value="Invite codes&amp;nbsp;&lt;div&gt;&amp;amp; In progress games&lt;div&gt;Redis DB&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="532.5" width="210" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-3" value="Games archive &amp;amp; Users&lt;div&gt;MySQL DB&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1270" y="262.5" width="210" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-4" target="PNa0oYaVAZ6Van3COsha-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1310" y="480" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1018" y="430" />
+              <mxPoint x="1385" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-13" value="Add invite code (with created user)&amp;nbsp;&lt;div&gt;&amp;amp; add second player (with joined user)&lt;/div&gt;&lt;div&gt;&amp;amp; verify invite code is usable&lt;div&gt;(direct query)&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-12">
+          <mxGeometry x="-0.3622" y="1" relative="1" as="geometry">
+            <mxPoint x="28" y="-29" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-4" target="PNa0oYaVAZ6Van3COsha-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-32" value="store finished games&amp;nbsp;&lt;div&gt;&amp;amp; request finished games&lt;br&gt;&amp;amp; get user&lt;br&gt;&lt;div&gt;(direct query)&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-30">
+          <mxGeometry x="0.1222" y="-4" relative="1" as="geometry">
+            <mxPoint x="-17" y="-34" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-4" value="invite code creation&amp;nbsp;&lt;div&gt;&amp;amp; Game Archive&lt;div&gt;REST API Server&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="890" y="275" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;exitX=0.25;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-5" target="PNa0oYaVAZ6Van3COsha-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-28" value="Store finished game&lt;div&gt;(http call)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-27">
+          <mxGeometry x="-0.4892" y="-3" relative="1" as="geometry">
+            <mxPoint x="-3" y="-42" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-5" target="PNa0oYaVAZ6Van3COsha-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-34" value="lookup valid invite codes&amp;nbsp;&lt;div&gt;&amp;amp; retrieve in progress game info&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;amp; update in progress game state&lt;br&gt;(direct query)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-33">
+          <mxGeometry x="0.04" relative="1" as="geometry">
+            <mxPoint y="-30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-5" value="live games orchestrator&lt;div&gt;Socket IO Server&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="895" y="535" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-6" target="PNa0oYaVAZ6Van3COsha-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-15" value="get new invite code (with user)&amp;nbsp;&lt;div&gt;&amp;amp; join game (with user)&lt;/div&gt;&lt;div&gt;&amp;amp; get game archive info&amp;nbsp;&lt;div&gt;(http call)&amp;nbsp;&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-14">
+          <mxGeometry x="0.3439" y="1" relative="1" as="geometry">
+            <mxPoint x="-32" y="-29" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-6" target="PNa0oYaVAZ6Van3COsha-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-24" value="Tell io client to connect&amp;nbsp;&lt;div&gt;after creating invite code or joining game&lt;/div&gt;&lt;div&gt;using invite code &amp;amp; user&lt;/div&gt;&lt;div&gt;(function call)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-23">
+          <mxGeometry x="-0.1317" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-6" value="Create/join games &amp;amp; games archive&lt;div&gt;HTTP Client&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="290" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-7" target="PNa0oYaVAZ6Van3COsha-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-20" value="join game using invite code key&amp;nbsp;&lt;div&gt;&amp;amp; send client moves&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;amp; receive new game state&lt;br&gt;(ws connection)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-19">
+          <mxGeometry x="-0.0307" relative="1" as="geometry">
+            <mxPoint x="7" y="-30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-7" value="Live game&amp;nbsp;&lt;div&gt;socket io client&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="560" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="PNa0oYaVAZ6Van3COsha-18" target="PNa0oYaVAZ6Van3COsha-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-26" value="Forward local User&#39;s move&amp;nbsp;&lt;div&gt;&amp;amp; update board state from server&lt;br&gt;(to and from callback function calls)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="PNa0oYaVAZ6Van3COsha-25">
+          <mxGeometry x="0.2711" relative="1" as="geometry">
+            <mxPoint x="-15" y="50" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PNa0oYaVAZ6Van3COsha-18" value="User&#39;s game board (UI and logic)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="560" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

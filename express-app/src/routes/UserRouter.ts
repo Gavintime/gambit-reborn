@@ -1,5 +1,4 @@
 import { Router } from "express";
-import prisma from "../lib/prisma.js";
 import { createNewUser, getUser, isValidUserName } from "../lib/UserManager.js";
 
 const router = Router();

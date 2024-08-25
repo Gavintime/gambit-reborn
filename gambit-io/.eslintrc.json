@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "airbnb-base", 
+    "airbnb-typescript/base", 
+    "plugin:@typescript-eslint/recommended-type-checked",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "root": true,
+  "env": {
+    "es2022": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "project": "tsconfig.json"
+  },
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "object-shorthand": "off"
+  },
+  "ignorePatterns": ["dist"]
+}

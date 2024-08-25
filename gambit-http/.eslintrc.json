@@ -14,5 +14,5 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "object-shorthand":"off"
   },
-  "ignorePatterns": ["dist", "src_OLD"]
+  "ignorePatterns": ["dist"]
 }

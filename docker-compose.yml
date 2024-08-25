@@ -1,6 +1,6 @@
 services:
-  express-app:
-    build: ./express-app
+  gambit-http:
+    build: ./gambit-http
     environment:
       - DATABASE_URL=mysql://root:devpass@mysql-db:3306/gambit
       - REDIS_HOST=redis-db
@@ -11,7 +11,7 @@ services:
       - 9229:9229
     command: npm run dev
     volumes:
-      - ./express-app:/srv/app
+      - ./gambit-http:/srv/app
       # don't sync node modules
       - /srv/app/node_modules
 

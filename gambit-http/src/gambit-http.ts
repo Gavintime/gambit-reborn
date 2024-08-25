@@ -12,7 +12,7 @@ import userRouter from "./routes/UserRouter.js";
 import gameRouter from "./routes/GameRouter.js";
 import inviteCodeRouter from "./routes/InviteCodeRouter.js";
 
-const debug = Debug("gambit:express-app");
+const debug = Debug("gambit:main");
 
 const app = express();
 

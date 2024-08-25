@@ -1,6 +1,6 @@
 import Debug from "debug";
 import http from "node:http";
-import expressApp from "./express-app.js";
+import gambitHttp from "./gambit-http.js";
 // import io from './socket-app.js'
 
 /**
@@ -65,9 +65,9 @@ if (!port) {
   console.error("Unable to get port");
   process.exit(1);
 }
-expressApp.set("port", port);
+gambitHttp.set("port", port);
 
-const server = http.createServer(expressApp);
+const server = http.createServer(gambitHttp);
 // io.attach(server)
 
 // Listen on provided port, on all network interfaces.

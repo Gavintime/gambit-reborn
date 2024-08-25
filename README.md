@@ -13,7 +13,7 @@ A webapp to play Chess in realtime
 ## Development
 
 Add the following to your .vscode settings.json file in the project root. This fixes eslint.
-`"eslint.workingDirectories": ["./express-app"]`
+`"eslint.workingDirectories": ["./gambit-http"]`
 
 ## Attributions
 

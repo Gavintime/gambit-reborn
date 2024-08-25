@@ -37,7 +37,7 @@ async function makeNewGameCode(
     JSON.stringify(newGameState),
     "NX",
   );
-  // recursively retry on the low change we get a collision
+  // recursively retry on the low chance we get a collision
   if (redisSetResult === null) {
     debug(`collision!!!, duplicate code: ${code}, retrying...`);
     code = await makeNewGameCode(userId, color);

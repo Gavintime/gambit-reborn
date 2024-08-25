@@ -23,26 +23,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(compression());
 
+
 // routers
 app.use("/user", userRouter);
 app.use("/invite-code", inviteCodeRouter);
 app.use("/game", gameRouter);
 
+
+// default error handlers
 app.use((req, res) => {
   res.status(404).json("Endpoint not found");
 });
 
 // we don't inline so that we can manually say it's an ErrorRequestHandler
-// typescript won't understand types correctly otherwise
+// *typescript* won't understand types correctly otherwise
 // !!!the unused next param is load bearing!!!
-// express doesn't know this is the error handler without it
+// *express* doesn't know this is the error handler without it
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   // TODO: better logging
   debug(err);
-  res.status(500).json("Unknown Error");
+  res.status(500).json("Internal Error");
 };
 
 app.use(errorHandler);
+
 
 export default app;

@@ -1,0 +1,1 @@
+move share modules/types to a single location (GameState, isValidUser, etc)

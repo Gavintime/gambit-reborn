@@ -1,0 +1,14 @@
+the socket app communicates with the frontend to update state as users make moves
+
+the socket app is stateless, and there may be multiple socket app instances running
+
+when a user joins a game through socket app, socket app subscribes to the user's game redis topic (invite code), 
+and pulls the latest gate state redis key value
+
+when a user sends a move to socket app, socket app publishes to the redis game topic and updates the game's redis key value
+
+this redundancy is so that when a user (re)joins a game, 
+socket app is able to grab the latest game state, without waiting on a new topic publish event
+
+an alternative would be to not use normal redis pubsub topics, and instead sub to key value updates
+this redis feature is more meant for logging and debugging however, which is why the feature is not used however

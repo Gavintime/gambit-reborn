@@ -1,7 +1,7 @@
 type GameState = {
   whiteUserId: number | null;
   blackUserId: number | null;
-  moves: string | null;
+  pgn: string | null;
 };
 
 export default GameState;

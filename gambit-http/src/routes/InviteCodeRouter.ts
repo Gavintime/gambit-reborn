@@ -28,7 +28,7 @@ async function makeNewGameCode(
   const newGameState: GameState = {
     whiteUserId: color === "w" ? userId : null,
     blackUserId: color === "b" ? userId : null,
-    moves: null,
+    pgn: null,
   };
 
   // TODO: expire time

@@ -68,13 +68,14 @@ export class Chess {
    *
    * This is used as a callback whenever IoClient gets game state
    */
-  public updateGameState(fen: string, moves: string[]): void {
-    if (this.chessjs.fen() === fen) {
-      console.warn('got duplicate game state data')
-      return
-    }
+  public updateGameState(pgn: string): void {
+    // TODO: compare this using pgn
+    // if (this.chessjs.fen() === fen) {
+    //   console.warn('got duplicate game state data')
+    //   return
+    // }
 
-    this.chessjs.load(fen)
+    this.chessjs.loadPgn(pgn)
     this.setGroundtoChessJs()
   }
 

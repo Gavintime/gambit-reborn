@@ -40,7 +40,7 @@ onMounted(() => {
   // constructor connects to socket io server
   ioClient = new IoClient(
     startNewGame,
-    (fen, moves) => chess.updateGameState(fen, moves)
+    (pgn) => chess.updateGameState(pgn)
   );
 
   chess.setClientMoveCallback((from, to, promotion) => ioClient.makeMove(from, to, promotion))
